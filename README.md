@@ -374,12 +374,19 @@ backend/venv/bin/python3 backend/entrypoints/run_agent_langneuron.py --freeze
 backend/venv/bin/python3 backend/entrypoints/run_agent_langneuron.py --freeze --clean-memory
 ```
 
-**📊 Tracking Conversations & LangTrace**
-When running in backend mode, you can monitor token usage, LLM costs, and agent thought processes using LangTrace. All tool calls and agent responses are logged in Redis.
+**📊 Tracking Conversations & LangTrace (Cost Analytics)**
 
-To view live telemetry and conversation logs:
+LangNeurons features a built-in **LangTrace** interceptor that automatically tracks every LLM call across your swarm. It calculates exact token usage and financial cost in real-time, storing it in Redis (`langtrace:{session_id}:calls`). 
+
+This tracks:
+- **Input/Output Tokens** per agent
+- **Cost breakdown** (e.g., how much the `architect` spent vs the `writer`)
+- **System Prompt Overhead** (skeleton tokens vs skill tokens)
+
+If you are using the Frontend Console, this data is automatically visualized in the Telemetry tab. If you are using the Backend CLI, you can view the live thought processes and cost analytics by running:
+
 ```bash
-# View live thought processes and API cost tracing
+# View live agent thoughts and LangTrace cost metrics
 backend/venv/bin/python3 backend/tests/monitor_conversations.py
 ```
 
