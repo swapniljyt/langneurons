@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.png" alt="LangNeurons Logo" width="520"/>
+  <img src="backend/assets/logo.png" alt="LangNeurons Logo" width="520"/>
 </p>
 
 <p align="center">
