@@ -337,21 +337,27 @@ def build_swarm_tree() -> AgentNode:
     return root
 ```
 
-### 3. Run
+### 3. Run (Two-Step Process)
 
+To use the visual **Swarm Brain Engine Console**, you need to run both the orchestrator backend and the frontend interface in separate terminal windows.
+
+**Terminal 1: Start the Backend Orchestrator**
 ```bash
-# Step 1 — Build the swarm (generate skills, save tree to Redis)
-venv/bin/python3 entrypoints/run_agent_langneuron.py
-
-# Step 2 — Execute the swarm (load tree, start chat)
-venv/bin/python3 entrypoints/run_agent_langneuron.py --freeze
-
-# Step 3 — Reset execution history, keep tree structure
-venv/bin/python3 entrypoints/run_agent_langneuron.py --freeze --clean-memory
-
-# Tip — Skip skill regeneration if FORMATION_BRIEF is unchanged
-venv/bin/python3 entrypoints/run_agent_langneuron.py --cache
+# This starts the LangNeurons engine and loads your configuration
+./run.sh
 ```
+
+**Terminal 2: Start the Frontend Console**
+```bash
+# Navigate to the frontend folder and start the UI server
+cd frontend
+python3 server.py
+```
+
+Once both are running, open your browser to **[http://localhost:8000](http://localhost:8000)** to access your interactive LangNeurons console!
+
+> **CLI Mode (No UI):** If you prefer to run agents directly in the terminal without the frontend console, you can execute:
+> `backend/venv/bin/python3 backend/entrypoints/run_agent_langneuron.py --freeze`
 
 ---
 
