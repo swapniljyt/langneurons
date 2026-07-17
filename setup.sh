@@ -7,8 +7,8 @@ BLUE='\033[0;34m'
 
 echo -e "${BLUE}=== Setup LangNeurons Workspace ===${NC}"
 
-# Go into langneurons subdirectory and run setup.sh
-cd langneurons
+# Go into backend subdirectory and run setup.sh
+cd backend
 chmod +x setup.sh
 ./setup.sh
 

@@ -15,5 +15,5 @@ if command -v redis-server &> /dev/null; then
 fi
 
 # Move into the frontend directory and run with the workspace virtualenv
-cd langneuron_frontend
-../langneurons/venv/bin/python3 server.py
+cd frontend
+../backend/venv/bin/python3 server.py

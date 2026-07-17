@@ -1,3 +1,5 @@
+import sys, os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend")))
 import os
 import sys
 import json
@@ -15,9 +17,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 # Define project roots
 FRONTEND_DIR = os.path.dirname(os.path.abspath(__file__))
-LANGNEURONS_DIR = "/home/swapniljyot/snaptron-git/langneurons"
+LANGNEURONS_DIR = os.path.abspath(os.path.join(FRONTEND_DIR, "..", "backend"))
 
-# Inject langneurons into path so we can import AgentNode and run_swarm
+# Inject backend into path so we can import AgentNode and run_swarm
 if LANGNEURONS_DIR not in sys.path:
     sys.path.insert(0, LANGNEURONS_DIR)
 
@@ -439,7 +441,7 @@ def get_compile_results(session_id: str):
     Return compiled node attributes after a swarm run.
     Reads from Redis keys written by AgentNode.save_to_redis() and save_role_to_redis().
 
-    Key formats used by langneurons core:
+    Key formats used by backend core:
       neuron:{session_id}:{common_name}       → full node data (system_prompt, dynamic_name, skills…)
       neuron_role:{session_id}:{common_name}  → lightweight role update (dynamic_name + system_prompt)
     """
