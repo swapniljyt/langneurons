@@ -1,0 +1,151 @@
+# ══════════════════════════════════════════════════════════════
+# LangNeurons — .gitignore
+# ══════════════════════════════════════════════════════════════
+
+# ── Secrets & Environment Variables ───────────────────────────
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+.env.test
+!.env.example          # allow the safe template to be committed
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# ── Python ────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+*.pyc
+*.pyo
+*.pyd
+
+# ── Virtual Environments ───────────────────────────────────────
+venv/
+.venv/
+env/
+ENV/
+.python-version
+
+# ── Node.js / WhatsApp Web.js ──────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.npm/
+
+# ── WhatsApp session cache (contains auth tokens) ─────────────
+.wwebjs_auth/
+.wwebjs_cache/
+.wwebjs_cache*/
+session-*/
+*.session
+wwebjs_auth/
+
+# ── Agent Sandbox (all generated output) ──────────────────────
+sandbox/
+
+# ── Experiments & Personal files ─────────────────────────────
+experiments/
+assets/*
+!assets/logo.png          # allow the logo to be committed
+scratch/
+
+# ── Redis / Database dumps ─────────────────────────────────────
+*.rdb
+dump.rdb
+*.aof
+
+# ── Logs ──────────────────────────────────────────────────────
+*.log
+logs/
+*.log.*
+
+# ── Testing & Coverage ────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+.hypothesis/
+junit.xml
+
+# ── Type checking ─────────────────────────────────────────────
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+.pyre/
+
+# ── Build / Distribution ──────────────────────────────────────
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ── Jupyter Notebooks ─────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── IDE & Editors ─────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# ── macOS ─────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# ── Windows ───────────────────────────────────────────────────
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ── Linux ─────────────────────────────────────────────────────
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ── LangNeurons specific ──────────────────────────────────────
+# Auto-generated skill files (rebuilt on each run)
+core/skills/definitions/
+
+# Execution output directory
+entrypoints/output/
+
+# Any local test data
+tests/fixtures/local/
