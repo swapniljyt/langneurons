@@ -337,27 +337,51 @@ def build_swarm_tree() -> AgentNode:
     return root
 ```
 
-### 3. Run (Two-Step Process)
+### 3. Run
 
-To use the visual **Swarm Brain Engine Console**, you need to run both the orchestrator backend and the frontend interface in separate terminal windows.
+LangNeurons offers two ways to interact with your agent swarms: via the interactive visual console, or strictly through the backend CLI.
+
+#### Option A: Visual Console (Recommended)
+
+To use the interactive **Swarm Brain Engine Console**, run the orchestrator backend and the frontend in separate terminal windows.
 
 **Terminal 1: Start the Backend Orchestrator**
 ```bash
-# This starts the LangNeurons engine and loads your configuration
 ./run.sh
 ```
 
 **Terminal 2: Start the Frontend Console**
 ```bash
-# Navigate to the frontend folder and start the UI server
 cd frontend
 python3 server.py
 ```
+Open your browser to **[http://localhost:8000](http://localhost:8000)** to access the visual dashboard!
 
-Once both are running, open your browser to **[http://localhost:8000](http://localhost:8000)** to access your interactive LangNeurons console!
+---
 
-> **CLI Mode (No UI):** If you prefer to run agents directly in the terminal without the frontend console, you can execute:
-> `backend/venv/bin/python3 backend/entrypoints/run_agent_langneuron.py --freeze`
+#### Option B: Backend CLI Mode
+
+If you prefer to build and explore your swarms directly in the terminal without a UI, you can run the backend engine directly.
+
+```bash
+# Step 1 — Build Phase: Generate skills, allocate subtasks, save tree to Redis
+backend/venv/bin/python3 backend/entrypoints/run_agent_langneuron.py
+
+# Step 2 — Execution Phase: Load tree, activate agents, and start the swarm
+backend/venv/bin/python3 backend/entrypoints/run_agent_langneuron.py --freeze
+
+# Tip: Reset execution memory but keep the generated tree structure
+backend/venv/bin/python3 backend/entrypoints/run_agent_langneuron.py --freeze --clean-memory
+```
+
+**📊 Tracking Conversations & LangTrace**
+When running in backend mode, you can monitor token usage, LLM costs, and agent thought processes using LangTrace. All tool calls and agent responses are logged in Redis.
+
+To view live telemetry and conversation logs:
+```bash
+# View live thought processes and API cost tracing
+backend/venv/bin/python3 backend/tests/monitor_conversations.py
+```
 
 ---
 
