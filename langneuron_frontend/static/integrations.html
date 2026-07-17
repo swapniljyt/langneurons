@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>LangNeurons | Integrations - Connectors & LLM Engines</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#272a2c",
+                        "primary-fixed": "#aff1cf",
+                        "surface": "#101415",
+                        "tertiary-fixed-dim": "#b5c4ff",
+                        "surface-container-lowest": "#0b0f10",
+                        "on-surface-variant": "#bfc9c1",
+                        "on-primary-container": "#002112",
+                        "outline-variant": "#404943",
+                        "outline": "#707973",
+                        "on-surface": "#e0e3e5",
+                        "primary": "#94d4b4",
+                        "primary-container": "#005233",
+                        "surface-container-low": "#191c1e",
+                        "surface-container": "#1b1f20",
+                        "background": "#101415",
+                        "on-background": "#e0e3e5",
+                        "secondary": "#70ffba",
+                        "secondary-fixed": "#4dffb1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xl": "64px",
+                        "margin-mobile": "16px",
+                        "lg": "40px",
+                        "gutter": "20px",
+                        "sm": "16px",
+                        "margin-desktop": "32px",
+                        "base": "4px",
+                        "xs": "8px",
+                        "md": "24px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "headline-xl": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "label-caps": ["JetBrains Mono"],
+                        "code-md": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "code-md": ["14px", {"lineHeight": "22px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            background-color: #101415;
+            color: #e0e3e5;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(148, 212, 180, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 212, 180, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        .glow-green {
+            box-shadow: 0 0 30px 0 rgba(148, 212, 180, 0.15);
+        }
+        .bento-card {
+            background: rgba(25, 28, 30, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(64, 73, 67, 0.5);
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .bento-card:hover {
+            border-color: rgba(148, 212, 180, 0.4);
+            background: rgba(29, 32, 34, 0.8);
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.5);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #e0e3e5 20%, #94d4b4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .btn-glass-green {
+            background: rgba(148, 212, 180, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(148, 212, 180, 0.25);
+            color: #94d4b4 !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+        }
+        .btn-glass-green:hover {
+            background: rgba(148, 212, 180, 0.18) !important;
+            border-color: rgba(148, 212, 180, 0.5) !important;
+            color: #b5ebd0 !important;
+            box-shadow: 0 0 25px rgba(148, 212, 180, 0.35);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body class="dark selection:bg-primary/30 grid-bg">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-20 bg-background/90 backdrop-blur-xl border-b border-outline-variant/30">
+    <a href="/" class="flex items-center gap-3 select-none">
+        <svg class="h-9 w-9 text-primary" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line x1="39" y1="72" x2="20" y2="88" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+            <circle cx="20" cy="88" r="7" fill="currentColor" />
+            <line x1="81" y1="72" x2="100" y2="88" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+            <circle cx="100" cy="88" r="7" fill="currentColor" />
+            <polygon points="60,36 81,48 81,72 60,84 39,72 39,48" fill="currentColor" />
+            <line x1="60" y1="60" x2="60" y2="16" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+            <circle cx="60" cy="16" r="7" fill="currentColor" />
+            <circle cx="60" cy="60" r="7" fill="#fff" />
+        </svg>
+        <div class="flex flex-col justify-center leading-none">
+            <span class="font-headline-lg text-[22px] font-extrabold tracking-tight text-on-background">LangNeurons</span>
+            <span class="font-label-caps text-[9px] text-primary tracking-[0.25em] uppercase mt-0.5">Brain of LLMs</span>
+        </div>
+    </a>
+    <nav class="hidden md:flex items-center gap-lg">
+        <a class="text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors" href="/product.html">Product</a>
+        <a class="text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors" href="/ecosystem.html">Ecosystem</a>
+        <a class="text-body-sm font-semibold text-primary transition-colors" href="/integrations.html">Integrations</a>
+        <a class="text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors" href="/blog.html">Blog</a>
+        <a class="text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors" href="/docs.html">Docs</a>
+        <div class="w-px h-4 bg-outline-variant/50 mx-2"></div>
+        <button onclick="window.location.href='/console.html'" class="px-5 py-2.5 btn-glass-green font-bold text-sm rounded-lg transition-all">
+            Launch Console
+        </button>
+    </nav>
+    <button class="md:hidden p-xs active:opacity-70" onclick="toggleDrawer()">
+        <span class="material-symbols-outlined text-primary">menu</span>
+    </button>
+</header>
+
+<!-- NavigationDrawer -->
+<div class="fixed inset-0 bg-black/80 z-[55] hidden opacity-0 transition-opacity duration-300" id="drawer-overlay" onclick="toggleDrawer()"></div>
+<aside class="fixed inset-y-0 left-0 z-[60] h-full w-[300px] bg-surface-container-low border-r border-outline-variant shadow-2xl -translate-x-full mobile-drawer-transition" id="main-drawer">
+    <div class="p-md flex flex-col h-full">
+        <div class="flex justify-between items-center mb-lg">
+            <div class="flex items-center gap-2 select-none">
+                <svg class="h-7 w-7 text-primary" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="39" y1="72" x2="20" y2="88" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+                    <circle cx="20" cy="88" r="7" fill="currentColor" />
+                    <line x1="81" y1="72" x2="100" y2="88" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+                    <circle cx="100" cy="88" r="7" fill="currentColor" />
+                    <polygon points="60,36 81,48 81,72 60,84 39,72 39,48" fill="currentColor" />
+                    <line x1="60" y1="60" x2="60" y2="16" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+                    <circle cx="60" cy="16" r="7" fill="currentColor" />
+                    <circle cx="60" cy="60" r="7" fill="#fff" />
+                </svg>
+                <div class="flex flex-col justify-center leading-none">
+                    <span class="font-headline-lg text-lg font-extrabold tracking-tight text-on-background">LangNeurons</span>
+                    <span class="font-label-caps text-[8px] text-primary tracking-[0.25em] uppercase">Brain of LLMs</span>
+                </div>
+            </div>
+            <button class="p-xs hover:bg-surface-variant rounded-full" onclick="toggleDrawer()">
+                <span class="material-symbols-outlined text-on-surface-variant">close</span>
+            </button>
+        </div>
+        <nav class="flex flex-col gap-xs">
+            <a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-200 rounded-xl" href="/product.html">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <span class="font-body-md font-semibold">Product</span>
+            </a>
+            <a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-200 rounded-xl" href="/ecosystem.html">
+                <span class="material-symbols-outlined">hub</span>
+                <span class="font-body-md font-semibold">Ecosystem</span>
+            </a>
+            <a class="flex items-center gap-md p-sm text-primary bg-primary-container/20 rounded-xl transition-all duration-200" href="/integrations.html">
+                <span class="material-symbols-outlined">extension</span>
+                <span class="font-body-md font-semibold">Integrations</span>
+            </a>
+            <a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-200 rounded-xl" href="/blog.html">
+                <span class="material-symbols-outlined">article</span>
+                <span class="font-body-md font-semibold">Blog</span>
+            </a>
+            <a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-200 rounded-xl" href="/docs.html">
+                <span class="material-symbols-outlined">description</span>
+                <span class="font-body-md font-semibold">Docs</span>
+            </a>
+        </nav>
+        <div class="mt-auto pt-md border-t border-outline-variant">
+            <button onclick="window.location.href='/console.html'" class="w-full py-3 btn-glass-green font-bold rounded-xl mb-4">Launch Console</button>
+        </div>
+    </div>
+</aside>
+
+<main class="pt-20">
+    <section class="px-margin-mobile md:px-margin-desktop py-20 max-w-7xl mx-auto">
+        <div class="max-w-4xl mb-16">
+            <div class="inline-flex items-center gap-xs px-4 py-1.5 border border-primary/30 rounded-full bg-primary/5 mb-6 backdrop-blur-sm">
+                <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                <span class="font-label-caps text-[11px] text-primary tracking-wider">CONNECTORS & LLMS</span>
+            </div>
+            <h1 class="font-headline-xl text-5xl md:text-6xl font-extrabold text-gradient mb-8 leading-tight">
+                Unified Integration Matrix
+            </h1>
+            <p class="text-body-md text-on-surface-variant max-w-2xl text-lg opacity-80 leading-relaxed">
+                Connect your workspace canvas to any language model provider, pipeline engine, or local database system. LangNeurons unifies the entire execution stack.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
+            <!-- LLM Providers -->
+            <div class="bento-card rounded-2xl p-8 border border-outline-variant/30 flex flex-col gap-6">
+                <h3 class="font-headline-lg text-2xl font-bold text-on-background flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">psychology</span>
+                    Supported Model Engines
+                </h3>
+                <p class="text-body-sm text-on-surface-variant leading-relaxed opacity-75">
+                    Deploy agent nodes using standard API routers or locally hosted inference models. Each node can be mapped to a specific provider:
+                </p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-4 bg-background/50 rounded-xl border border-outline-variant/20">
+                        <h4 class="font-headline-lg text-sm font-bold mb-1">OpenAI</h4>
+                        <p class="text-[11px] text-on-surface-variant">GPT-4o, GPT-4o-mini</p>
+                    </div>
+                    <div class="p-4 bg-background/50 rounded-xl border border-outline-variant/20">
+                        <h4 class="font-headline-lg text-sm font-bold mb-1">Google Cloud</h4>
+                        <p class="text-[11px] text-on-surface-variant">Gemini 2.5 Pro, Flash</p>
+                    </div>
+                    <div class="p-4 bg-background/50 rounded-xl border border-outline-variant/20">
+                        <h4 class="font-headline-lg text-sm font-bold mb-1">Anthropic</h4>
+                        <p class="text-[11px] text-on-surface-variant">Claude 3.5 Sonnet, Haiku</p>
+                    </div>
+                    <div class="p-4 bg-background/50 rounded-xl border border-outline-variant/20">
+                        <h4 class="font-headline-lg text-sm font-bold mb-1">Mistral AI</h4>
+                        <p class="text-[11px] text-on-surface-variant">Large, Codestral</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Frameworks & DB -->
+            <div class="bento-card rounded-2xl p-8 border border-outline-variant/30 flex flex-col gap-6">
+                <h3 class="font-headline-lg text-2xl font-bold text-on-background flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary">database</span>
+                    Infrastructure & Tooling
+                </h3>
+                <p class="text-body-sm text-on-surface-variant leading-relaxed opacity-75">
+                    The backend core utilizes high-performance orchestration frameworks and message broker queues to maintain state consistency:
+                </p>
+                <div class="space-y-4">
+                    <div class="p-4 bg-background/50 rounded-xl border border-outline-variant/20 flex items-start gap-4">
+                        <span class="material-symbols-outlined text-primary mt-0.5">account_tree</span>
+                        <div>
+                            <h4 class="font-headline-lg text-sm font-bold mb-1">LangGraph / LangChain</h4>
+                            <p class="text-[12px] text-on-surface-variant leading-relaxed opacity-80">Used to define acyclic agent message passes, state schemas, and checkpoint nodes.</p>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-background/50 rounded-xl border border-outline-variant/20 flex items-start gap-4">
+                        <span class="material-symbols-outlined text-primary mt-0.5">dynamic_feed</span>
+                        <div>
+                            <h4 class="font-headline-lg text-sm font-bold mb-1">Redis Cache Queuing</h4>
+                            <p class="text-[12px] text-on-surface-variant leading-relaxed opacity-80">Locks thread configurations, routes WebSocket data chunks, and saves compiler states.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integration Logo Cloud section -->
+        <div class="bento-card rounded-2xl p-12 text-center border border-outline-variant/30">
+            <h3 class="font-label-caps text-xs text-primary tracking-widest uppercase mb-8">COMPATIBLE ENVIRONMENTS</h3>
+            <div class="flex flex-wrap justify-center items-center gap-12 opacity-60">
+                <span class="text-xl font-bold font-headline-lg text-on-background">LangGraph</span>
+                <span class="text-xl font-bold font-headline-lg text-on-background">Redis</span>
+                <span class="text-xl font-bold font-headline-lg text-on-background">SQLite</span>
+                <span class="text-xl font-bold font-headline-lg text-on-background">Docker</span>
+                <span class="text-xl font-bold font-headline-lg text-on-background">Playwright</span>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="w-full pt-20 pb-16 px-margin-mobile md:px-margin-desktop bg-background border-t border-outline-variant/20">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start gap-16 mb-16">
+            <div class="flex flex-col gap-6 max-w-sm">
+                <div class="flex items-center gap-3 select-none self-start">
+                    <svg class="h-10 w-10 text-primary" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="39" y1="72" x2="20" y2="88" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+                        <circle cx="20" cy="88" r="7" fill="currentColor" />
+                        <line x1="81" y1="72" x2="100" y2="88" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+                        <circle cx="100" cy="88" r="7" fill="currentColor" />
+                        <polygon points="60,36 81,48 81,72 60,84 39,72 39,48" fill="currentColor" />
+                        <line x1="60" y1="60" x2="60" y2="16" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+                        <circle cx="60" cy="16" r="7" fill="currentColor" />
+                        <circle cx="60" cy="60" r="7" fill="#fff" />
+                    </svg>
+                    <div class="flex flex-col justify-center leading-none">
+                        <span class="font-headline-lg text-2xl font-bold tracking-tight text-on-background">LangNeurons</span>
+                        <span class="font-label-caps text-[9px] text-primary tracking-[0.25em] uppercase mt-0.5">Brain of LLMs</span>
+                    </div>
+                </div>
+                <p class="text-body-sm text-on-surface-variant leading-relaxed opacity-70">
+                    Empowering developers to build the next generation of hierarchical multi-agent systems with precision, security, and enterprise-grade reliability.
+                </p>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-12 sm:gap-16">
+                <div class="flex flex-col gap-4">
+                    <p class="font-label-caps text-xs text-primary uppercase tracking-wider">Product</p>
+                    <a class="text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="/product.html">Features</a>
+                    <a class="text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="/docs.html">SDKs</a>
+                    <a class="text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="/console.html">Console</a>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <p class="font-label-caps text-xs text-primary uppercase tracking-wider">Ecosystem</p>
+                    <a class="text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="/ecosystem.html">Nodes</a>
+                    <a class="text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="/integrations.html">Connectors</a>
+                    <a class="text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="/blog.html">Showcase</a>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <p class="font-label-caps text-xs text-primary uppercase tracking-wider">Resources</p>
+                    <a class="text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="/docs.html">Docs</a>
+                    <a class="text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="/blog.html">Blog</a>
+                    <a class="text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Status</a>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <p class="font-label-caps text-xs text-primary uppercase tracking-wider">Corporate</p>
+                    <a class="text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">About</a>
+                    <a class="text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Security</a>
+                    <a class="text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Contact</a>
+                </div>
+            </div>
+        </div>
+        <div class="pt-8 border-t border-outline-variant/10 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p class="text-body-sm text-on-surface-variant text-[12px] opacity-60">© 2026 LangNeurons Inc. All rights reserved.</p>
+            <div class="flex gap-6">
+                <a class="text-body-sm text-on-surface-variant text-[12px] hover:text-primary transition-colors" href="#">Privacy</a>
+                <a class="text-body-sm text-on-surface-variant text-[12px] hover:text-primary transition-colors" href="#">Terms</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function toggleDrawer() {
+        const drawer = document.getElementById('main-drawer');
+        const overlay = document.getElementById('drawer-overlay');
+        if (drawer.classList.contains('-translate-x-full')) {
+            drawer.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.add('opacity-100'), 50);
+        } else {
+            drawer.classList.add('-translate-x-full');
+            overlay.classList.remove('opacity-100');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+        }
+    }
+</script>
+<script src="/auth-helper.js"></script>
+</body>
+</html>

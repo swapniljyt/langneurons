@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>LangNeurons | Decompose complexity into intelligent agents</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#272a2c",
+                        "primary-fixed": "#aff1cf",
+                        "surface": "#101415",
+                        "tertiary-fixed-dim": "#c7c6ca",
+                        "surface-dim": "#101415",
+                        "background": "#101415",
+                        "on-error-container": "#ffdad6",
+                        "surface-variant": "#323537",
+                        "on-tertiary-fixed-variant": "#46474a",
+                        "surface-container-lowest": "#0b0f10",
+                        "on-tertiary-container": "#adadb1",
+                        "error-container": "#93000a",
+                        "surface-container-low": "#191c1e",
+                        "tertiary": "#c7c6ca",
+                        "on-primary-fixed": "#002114",
+                        "error": "#ffb4ab",
+                        "on-primary": "#003825",
+                        "surface-container": "#1d2022",
+                        "on-background": "#e0e3e5",
+                        "tertiary-container": "#404144",
+                        "outline-variant": "#404943",
+                        "inverse-on-surface": "#2d3133",
+                        "inverse-primary": "#2a694f",
+                        "primary-container": "#004b33",
+                        "on-primary-container": "#7bba9b",
+                        "inverse-surface": "#e0e3e5",
+                        "on-primary-fixed-variant": "#0a5138",
+                        "surface-container-highest": "#323537",
+                        "on-secondary-fixed-variant": "#005233",
+                        "tertiary-fixed": "#e3e2e6",
+                        "outline": "#89938c",
+                        "primary-fixed-dim": "#94d4b4",
+                        "secondary-container": "#00e598",
+                        "primary": "#94d4b4",
+                        "on-tertiary-fixed": "#1a1b1e",
+                        "surface-bright": "#363a3b",
+                        "on-tertiary": "#2f3033",
+                        "secondary": "#70ffba",
+                        "on-error": "#690005",
+                        "secondary-fixed": "#4dffb1",
+                        "on-secondary-fixed": "#002112",
+                        "on-surface": "#e0e3e5",
+                        "secondary-fixed-dim": "#00e296",
+                        "on-surface-variant": "#bfc9c1",
+                        "surface-tint": "#94d4b4",
+                        "on-secondary": "#003822",
+                        "on-secondary-container": "#00613e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xl": "64px",
+                        "margin-mobile": "16px",
+                        "lg": "40px",
+                        "gutter": "20px",
+                        "sm": "16px",
+                        "margin-desktop": "32px",
+                        "base": "4px",
+                        "xs": "8px",
+                        "md": "24px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "headline-xl": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "label-caps": ["JetBrains Mono"],
+                        "code-md": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "code-md": ["14px", {"lineHeight": "22px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            background-color: #101415;
+            color: #e0e3e5;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(148, 212, 180, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 212, 180, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        .glow-green {
+            box-shadow: 0 0 30px 0 rgba(148, 212, 180, 0.15);
+        }
+        .bento-card {
+            background: rgba(25, 28, 30, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(64, 73, 67, 0.5);
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .bento-card:hover {
+            border-color: rgba(148, 212, 180, 0.4);
+            background: rgba(29, 32, 34, 0.8);
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.5);
+        }
+        .terminal-shadow {
+            box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.9);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0b0f10;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #323537;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #404943;
+        }
+        .mobile-drawer-transition {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #e0e3e5 20%, #94d4b4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .code-keyword { color: #94d4b4; }
+        .code-string { color: #c7c6ca; }
+        .code-comment { color: #46474a; }
+        .code-number { color: #70ffba; }
+        .btn-glass-green {
+            background: rgba(148, 212, 180, 0.08);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(148, 212, 180, 0.25);
+            color: #94d4b4 !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+        }
+        .btn-glass-green:hover {
+            background: rgba(148, 212, 180, 0.18) !important;
+            border-color: rgba(148, 212, 180, 0.5) !important;
+            color: #b5ebd0 !important;
+            box-shadow: 0 0 25px rgba(148, 212, 180, 0.35);
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body class="dark selection:bg-primary/30 grid-bg">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop h-20 bg-background/90 backdrop-blur-xl border-b border-outline-variant/30">
+    <div class="flex items-center gap-3 select-none">
+        <!-- Hexagonal SVG Logo -->
+        <svg class="h-9 w-9 text-primary" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Bottom-Left Node Line -->
+            <line x1="39" y1="72" x2="20" y2="88" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+            <circle cx="20" cy="88" r="7" fill="currentColor" />
+            
+            <!-- Bottom-Right Node Line -->
+            <line x1="81" y1="72" x2="100" y2="88" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+            <circle cx="100" cy="88" r="7" fill="currentColor" />
+            
+            <!-- Hexagon Body -->
+            <polygon points="60,36 81,48 81,72 60,84 39,72 39,48" fill="currentColor" />
+            
+            <!-- Top Node Line -->
+            <line x1="60" y1="60" x2="60" y2="16" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+            <circle cx="60" cy="16" r="7" fill="currentColor" />
+            
+            <!-- Center Circle -->
+            <circle cx="60" cy="60" r="7" fill="#fff" />
+        </svg>
+        <div class="flex flex-col justify-center leading-none">
+            <span class="font-headline-lg text-[22px] font-extrabold tracking-tight text-on-background">LangNeurons</span>
+            <span class="font-label-caps text-[9px] text-primary tracking-[0.25em] uppercase mt-0.5">Brain of LLMs</span>
+        </div>
+    </div>
+    <nav class="hidden md:flex items-center gap-lg">
+        <a class="text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors" href="/product.html">Product</a>
+        <a class="text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors" href="/ecosystem.html">Ecosystem</a>
+        <a class="text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors" href="/integrations.html">Integrations</a>
+        <a class="text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors" href="/blog.html">Blog</a>
+        <a class="text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors" href="/docs.html">Docs</a>
+        <div class="w-px h-4 bg-outline-variant/50 mx-2"></div>
+        <button onclick="window.location.href='/console.html'" class="px-5 py-2.5 btn-glass-green font-bold text-sm rounded-lg transition-all">
+            Launch Console
+        </button>
+    </nav>
+    <button class="md:hidden p-xs active:opacity-70" onclick="toggleDrawer()">
+        <span class="material-symbols-outlined text-primary">menu</span>
+    </button>
+</header>
+<!-- NavigationDrawer -->
+<div class="fixed inset-0 bg-black/80 z-[55] hidden opacity-0 transition-opacity duration-300" id="drawer-overlay" onclick="toggleDrawer()"></div>
+<aside class="fixed inset-y-0 left-0 z-[60] h-full w-[300px] bg-surface-container-low border-r border-outline-variant shadow-2xl -translate-x-full mobile-drawer-transition" id="main-drawer">
+    <div class="p-md flex flex-col h-full">
+        <div class="flex justify-between items-center mb-lg">
+            <div class="flex items-center gap-2 select-none">
+                <!-- Hexagonal SVG Logo -->
+                <svg class="h-7 w-7 text-primary" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Bottom-Left Node Line -->
+                    <line x1="39" y1="72" x2="20" y2="88" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+                    <circle cx="20" cy="88" r="7" fill="currentColor" />
+                    
+                    <!-- Bottom-Right Node Line -->
+                    <line x1="81" y1="72" x2="100" y2="88" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+                    <circle cx="100" cy="88" r="7" fill="currentColor" />
+                    
+                    <!-- Hexagon Body -->
+                    <polygon points="60,36 81,48 81,72 60,84 39,72 39,48" fill="currentColor" />
+                    
+                    <!-- Top Node Line -->
+                    <line x1="60" y1="60" x2="60" y2="16" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+                    <circle cx="60" cy="16" r="7" fill="currentColor" />
+                    
+                    <!-- Center Circle -->
+                    <circle cx="60" cy="60" r="7" fill="#fff" />
+                </svg>
+                <div class="flex flex-col justify-center leading-none">
+                    <span class="font-headline-lg text-lg font-extrabold tracking-tight text-on-background">LangNeurons</span>
+                    <span class="font-label-caps text-[8px] text-primary tracking-[0.25em] uppercase">Brain of LLMs</span>
+                </div>
+            </div>
+            <button class="p-xs hover:bg-surface-variant rounded-full" onclick="toggleDrawer()">
+                <span class="material-symbols-outlined text-on-surface-variant">close</span>
+            </button>
+        </div>
+        <nav class="flex flex-col gap-xs">
+            <a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-200 rounded-xl" href="/product.html">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <span class="font-body-md font-semibold">Product</span>
+            </a>
+            <a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-200 rounded-xl" href="/ecosystem.html">
+                <span class="material-symbols-outlined">hub</span>
+                <span class="font-body-md font-semibold">Ecosystem</span>
+            </a>
+            <a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-200 rounded-xl" href="/integrations.html">
+                <span class="material-symbols-outlined">extension</span>
+                <span class="font-body-md font-semibold">Integrations</span>
+            </a>
+            <a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-200 rounded-xl" href="/blog.html">
+                <span class="material-symbols-outlined">article</span>
+                <span class="font-body-md font-semibold">Blog</span>
+            </a>
+            <a class="flex items-center gap-md p-sm text-on-surface-variant hover:bg-surface-variant transition-all duration-200 rounded-xl" href="/docs.html">
+                <span class="material-symbols-outlined">description</span>
+                <span class="font-body-md font-semibold">Docs</span>
+            </a>
+        </nav>
+        <div class="mt-auto pt-md border-t border-outline-variant">
+            <button onclick="window.location.href='/console.html'" class="w-full py-3 btn-glass-green font-bold rounded-xl mb-4">Launch Console</button>
+            <div class="flex items-center gap-sm p-sm">
+                <div class="w-10 h-10 rounded-lg bg-primary-container/30 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary text-[20px]">account_tree</span>
+                </div>
+                <div>
+                    <p class="text-on-surface font-body-sm text-[12px] font-bold">PRECISION V2.1</p>
+                    <p class="text-on-surface-variant font-body-sm text-[10px]">Stable Release</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>
+<main class="pt-20">
+    <!-- Hero Section -->
+    <section class="relative min-h-[90vh] flex flex-col px-margin-mobile pt-lg overflow-hidden md:px-margin-desktop md:pt-32 md:items-center md:text-center">
+        <!-- Background Decoration -->
+        <div class="absolute top-1/4 right-[-10%] w-[500px] h-[500px] bg-primary/10 blur-[150px] rounded-full pointer-events-none"></div>
+        <div class="absolute top-1/2 left-[-10%] w-[500px] h-[500px] bg-secondary/10 blur-[150px] rounded-full pointer-events-none"></div>
+        <div class="z-10 mt-md md:flex md:flex-col md:items-center md:max-w-5xl">
+            <div class="inline-flex items-center gap-xs px-4 py-1.5 border border-primary/30 rounded-full bg-primary/5 mb-md backdrop-blur-sm">
+                <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                <span class="font-label-caps text-[11px] text-primary tracking-wider">NEW: HIERARCHICAL SWARMS</span>
+            </div>
+            <h1 class="font-headline-xl text-[44px] md:text-[72px] mb-8 leading-[1] tracking-tight text-on-background">
+                Build AI Teams <span class="text-primary italic font-light">Visually.</span> Run Them <span class="text-gradient">Instantly.</span>
+            </h1>
+            <p class="font-body-md text-lg md:text-xl text-on-surface-variant mb-12 max-w-2xl mx-auto leading-relaxed opacity-90">
+                LangNeurons makes building AI easy. Just drag and drop AI agents on a canvas, connect them together, and we automatically turn your design into working Python code. Run your AI team instantly and watch them solve complex problems together!
+            </p>
+            <div class="flex flex-col gap-md md:flex-row md:justify-center md:w-auto">
+                <button onclick="window.location.href='/console.html'" class="w-full h-16 btn-glass-green text-lg font-bold rounded-xl flex items-center justify-center gap-sm md:px-10 transition-all">
+                    Start Building
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+                <button class="w-full h-16 border border-outline-variant text-on-background text-lg font-bold rounded-xl flex items-center justify-center gap-sm bg-surface-container-low/50 hover:bg-surface-variant backdrop-blur-sm md:px-10 transition-all">
+                    Documentation
+                </button>
+            </div>
+        </div>
+        <!-- Architecture Diagram -->
+        <div class="relative mt-24 flex justify-center w-full max-w-5xl mx-auto px-4 cursor-pointer" onclick="window.location.href='/console.html'">
+            <!-- Aspect Ratio Locked Container to guarantee perfect thread alignment -->
+            <div class="w-full border border-[#00ff9d]/20 rounded-3xl bg-[#030604]/90 backdrop-blur-xl overflow-hidden relative shadow-[0_0_80px_rgba(0,255,157,0.15)] group transition-transform duration-500 hover:scale-[1.01] hover:shadow-[0_0_100px_rgba(0,255,157,0.25)]" style="aspect-ratio: 1000/600;">
+                
+                <!-- Grid Overlay -->
+                <div class="absolute inset-0" style="background-image: radial-gradient(circle at 1px 1px, rgba(0,255,157,0.1) 1px, transparent 0); background-size: 24px 24px;"></div>
+                
+                <!-- SVG connecting lines -->
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <svg class="w-full h-full" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
+                        <!-- Root to Frontend -->
+                        <path d="M500,160 L380,340" stroke="#00ff9d" stroke-width="2" stroke-linecap="round" class="opacity-80 drop-shadow-[0_0_8px_rgba(0,255,157,0.8)]"></path>
+                        <!-- Root to Backend -->
+                        <path d="M500,160 L620,340" stroke="#00ff9d" stroke-width="2" stroke-linecap="round" class="opacity-80 drop-shadow-[0_0_8px_rgba(0,255,157,0.8)]"></path>
+                        <!-- Backend to child 1 -->
+                        <path d="M620,340 L520,500" stroke="#00ff9d" stroke-width="2" stroke-linecap="round" class="opacity-80 drop-shadow-[0_0_8px_rgba(0,255,157,0.8)]"></path>
+                        <!-- Backend to child 2 -->
+                        <path d="M620,340 L720,500" stroke="#00ff9d" stroke-width="2" stroke-linecap="round" class="opacity-80 drop-shadow-[0_0_8px_rgba(0,255,157,0.8)]"></path>
+
+                        <!-- White dots on lines -->
+                        <circle cx="440" cy="250" r="3.5" fill="white" />
+                        <circle cx="560" cy="250" r="3.5" fill="white" />
+                        <circle cx="670" cy="420" r="3.5" fill="white" />
+                    </svg>
+                </div>
+                
+                <!-- Glowing Background Rings -->
+                <div class="absolute top-[26.66%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[40%] h-[66%] rounded-full border border-[#00ff9d]/20 opacity-60 pointer-events-none" style="border-style: dashed;"></div>
+                <div class="absolute top-[26.66%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[60%] h-[100%] rounded-full border border-[#00ff9d]/10 opacity-30 pointer-events-none"></div>
+
+                <!-- Neurons -->
+                <div class="absolute inset-0 pointer-events-none">
+                    
+                    <!-- Root Node -->
+                    <div class="absolute top-[26.66%] left-[50%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                        <div class="w-[150px] h-[130px] rounded-2xl border-2 border-[#00ff9d] bg-[#030a06] flex flex-col items-center justify-center shadow-[0_0_60px_rgba(0,255,157,0.5)] relative">
+                            <span class="text-[#00ff9d] text-[10px] font-mono tracking-widest uppercase mb-1 flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">schema</span> ARCHITECT</span>
+                            <span class="font-bold text-white text-[13px] tracking-wider text-center">task_coordinator</span>
+                            <span class="text-[9px] text-[#00ff9d]/70 font-mono mt-1 uppercase">ROOT_NEURON</span>
+                            <div class="mt-3 w-3 h-3 rounded-full bg-[#00ff9d] shadow-[0_0_10px_rgba(0,255,157,0.8)]"></div>
+                        </div>
+                    </div>
+
+                    <!-- Left Child -->
+                    <div class="absolute top-[56.66%] left-[38%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                        <div class="w-[120px] h-[110px] rounded-2xl border-2 border-[#00ff9d] bg-[#030a06] flex flex-col items-center justify-center shadow-[0_0_40px_rgba(0,255,157,0.4)] relative">
+                            <span class="text-[#00ff9d] text-[9px] font-mono tracking-widest uppercase mb-1 flex items-center gap-1"><span class="material-symbols-outlined text-[10px]">edit</span> WRITER</span>
+                            <span class="font-bold text-white text-[11px] tracking-wider text-center">frontend_qa...</span>
+                            <span class="text-[8px] text-[#00ff9d]/70 font-mono mt-0.5 uppercase">NEURON_2</span>
+                            <div class="mt-2 w-2.5 h-2.5 rounded-full bg-[#00ff9d] shadow-[0_0_8px_rgba(0,255,157,0.8)]"></div>
+                        </div>
+                    </div>
+
+                    <!-- Right Child -->
+                    <div class="absolute top-[56.66%] left-[62%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                        <div class="w-[120px] h-[110px] rounded-2xl border-2 border-[#00ff9d] bg-[#030a06] flex flex-col items-center justify-center shadow-[0_0_40px_rgba(0,255,157,0.4)] relative">
+                            <span class="text-[#00ff9d] text-[9px] font-mono tracking-widest uppercase mb-1 flex items-center gap-1"><span class="material-symbols-outlined text-[10px]">edit</span> WRITER</span>
+                            <span class="font-bold text-white text-[11px] tracking-wider text-center">backend_arc...</span>
+                            <span class="text-[8px] text-[#00ff9d]/70 font-mono mt-0.5 uppercase">NEURON_1</span>
+                            <div class="mt-2 w-2.5 h-2.5 rounded-full bg-[#00ff9d] shadow-[0_0_8px_rgba(0,255,157,0.8)]"></div>
+                        </div>
+                    </div>
+
+                    <!-- Backend Child 1 -->
+                    <div class="absolute top-[83.33%] left-[52%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                        <div class="w-[100px] h-[95px] rounded-2xl border-2 border-[#00ff9d] bg-[#030a06] flex flex-col items-center justify-center shadow-[0_0_30px_rgba(0,255,157,0.3)] relative">
+                            <span class="text-[#00ff9d] text-[8px] font-mono tracking-widest uppercase mb-1 flex items-center gap-1"><span class="material-symbols-outlined text-[10px]">schema</span> ARCHITECT</span>
+                            <span class="font-bold text-white text-[9px] tracking-wider text-center">backend_a...</span>
+                            <span class="text-[7px] text-[#00ff9d]/70 font-mono mt-0.5 uppercase">NEURON_4</span>
+                            <div class="mt-2 w-2 h-2 rounded-full bg-[#00ff9d] shadow-[0_0_8px_rgba(0,255,157,0.8)]"></div>
+                        </div>
+                    </div>
+
+                    <!-- Backend Child 2 -->
+                    <div class="absolute top-[83.33%] left-[72%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+                        <div class="w-[100px] h-[95px] rounded-2xl border-2 border-[#00ff9d] bg-[#030a06] flex flex-col items-center justify-center shadow-[0_0_30px_rgba(0,255,157,0.3)] relative">
+                            <span class="text-[#00ff9d] text-[8px] font-mono tracking-widest uppercase mb-1 flex items-center gap-1"><span class="material-symbols-outlined text-[10px]">edit</span> WRITER</span>
+                            <span class="font-bold text-white text-[9px] tracking-wider text-center">database_sc...</span>
+                            <span class="text-[7px] text-[#00ff9d]/70 font-mono mt-0.5 uppercase">NEURON_3</span>
+                            <div class="mt-2 w-2 h-2 rounded-full bg-[#00ff9d] shadow-[0_0_8px_rgba(0,255,157,0.8)]"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zoom Controls mock -->
+                <div class="absolute top-6 right-6 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div class="w-8 h-8 rounded border border-[#00ff9d]/30 bg-[#030a06]/80 flex items-center justify-center cursor-pointer hover:bg-[#00ff9d]/20 text-[#00ff9d]">
+                        <span class="material-symbols-outlined text-[16px]">zoom_in</span>
+                    </div>
+                    <div class="w-8 h-8 rounded border border-[#00ff9d]/30 bg-[#030a06]/80 flex items-center justify-center cursor-pointer hover:bg-[#00ff9d]/20 text-[#00ff9d]">
+                        <span class="material-symbols-outlined text-[16px]">zoom_out</span>
+                    </div>
+                    <div class="w-8 h-8 rounded border border-[#00ff9d]/30 bg-[#030a06]/80 flex items-center justify-center cursor-pointer hover:bg-[#00ff9d]/20 text-[#00ff9d] text-[12px] font-mono font-bold">
+                        1:1
+                    </div>
+                    <div class="w-8 h-8 rounded border border-[#00ff9d]/30 bg-[#030a06]/80 flex items-center justify-center cursor-pointer hover:bg-[#00ff9d]/20 text-[#00ff9d]">
+                        <span class="material-symbols-outlined text-[16px]">fit_screen</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <!-- What You Can Build Section -->
+    <section class="px-margin-mobile py-32 bg-surface-container-lowest/20 md:px-margin-desktop border-y border-outline-variant/20">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-20 md:flex md:items-end md:justify-between">
+                <div class="max-w-2xl">
+                    <span class="font-label-caps text-[12px] text-primary uppercase tracking-[0.3em] font-bold">ENDLESS POSSIBILITIES</span>
+                    <h2 class="font-headline-lg text-[36px] md:text-[48px] text-on-background mt-6 leading-tight">What You Can Build</h2>
+                    <p class="font-body-md text-xl text-on-surface-variant mt-6 leading-relaxed opacity-80">
+                        With LangNeurons, you can orchestrate powerful AI teams to build virtually anything. Here are just a few examples of what our visual framework enables you to create in minutes.
+                    </p>
+                </div>
+                <div class="hidden md:block">
+                    <a class="text-primary font-bold text-sm flex items-center gap-2 group" href="#">
+                        See More Examples <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_right_alt</span>
+                    </a>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-md md:grid-cols-3">
+                <!-- Card 1 -->
+                <div class="bento-card p-10 rounded-3xl flex flex-col gap-lg">
+                    <div class="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-3xl">code_blocks</span>
+                    </div>
+                    <div>
+                        <h3 class="font-headline-lg text-2xl text-on-surface mb-4">AI Code Editors</h3>
+                        <p class="font-body-sm text-on-surface-variant leading-relaxed text-base opacity-80">
+                            Build intelligent coding assistants that can write, review, and debug entire codebases automatically by assigning different developer personas to your agents.
+                        </p>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="bento-card p-10 rounded-3xl flex flex-col gap-lg">
+                    <div class="w-14 h-14 bg-secondary/10 rounded-2xl flex items-center justify-center">
+                        <span class="material-symbols-outlined text-secondary text-3xl">web</span>
+                    </div>
+                    <div>
+                        <h3 class="font-headline-lg text-2xl text-on-surface mb-4">Website Generators</h3>
+                        <p class="font-body-sm text-on-surface-variant leading-relaxed text-base opacity-80">
+                            Create swarms where one agent designs the layout, another writes the HTML/CSS, and a third writes the logic. Generate entire websites from a single prompt.
+                        </p>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="bento-card p-10 rounded-3xl flex flex-col gap-lg">
+                    <div class="w-14 h-14 bg-tertiary/10 rounded-2xl flex items-center justify-center">
+                        <span class="material-symbols-outlined text-tertiary text-3xl">account_tree</span>
+                    </div>
+                    <div>
+                        <h3 class="font-headline-lg text-2xl text-on-surface mb-4">Complex Workflows</h3>
+                        <p class="font-body-sm text-on-surface-variant leading-relaxed text-base opacity-80">
+                            Automate everything from deep internet research to data analysis. Connect agents together to create multi-step business operations that run on autopilot.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Setup Section -->
+    <section class="px-margin-mobile py-24 bg-surface-container-lowest/10 md:px-margin-desktop border-b border-outline-variant/10">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-16 text-center">
+                <span class="font-label-caps text-[12px] text-primary uppercase tracking-[0.3em] font-bold">GETTING STARTED</span>
+                <h2 class="font-headline-lg text-[36px] md:text-[48px] text-on-background mt-4 leading-tight">Install & Launch in 3 Simple Steps</h2>
+                <p class="font-body-md text-lg text-on-surface-variant mt-4 max-w-2xl mx-auto opacity-80">
+                    Get your local workspace up and running instantly. Run hierarchical agent networks on your machine with full state control.
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Step 1 -->
+                <div class="bento-card p-8 rounded-3xl border border-outline-variant/30 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-xs font-label-caps text-primary bg-primary/10 border border-primary/20 px-3 py-1 rounded-full">STEP 01</span>
+                            <span class="material-symbols-outlined text-primary text-3xl">download_for_offline</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-on-background mb-4">Run the Setup Script</h3>
+                        <p class="text-sm text-on-surface-variant leading-relaxed mb-6 opacity-80">
+                            Initialize the Python virtual environment, install agent dependencies, and configure local Redis daemon components.
+                        </p>
+                    </div>
+                    <div class="bg-black/50 p-4 rounded-xl border border-outline-variant/20 font-code-md text-xs text-on-surface-variant">
+                        <span class="text-primary">$</span> ./setup.sh
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="bento-card p-8 rounded-3xl border border-outline-variant/30 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-xs font-label-caps text-secondary bg-secondary/10 border border-secondary/20 px-3 py-1 rounded-full">STEP 02</span>
+                            <span class="material-symbols-outlined text-secondary text-3xl">key</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-on-background mb-4">Configure Credentials</h3>
+                        <p class="text-sm text-on-surface-variant leading-relaxed mb-6 opacity-80">
+                            Add your LLM provider credentials and Redis connection details in the Settings pane or paste directly into `.env`.
+                        </p>
+                    </div>
+                    <div class="bg-black/50 p-4 rounded-xl border border-outline-variant/20 font-code-md text-xs text-on-surface-variant">
+                        <span class="text-secondary">#</span> Edit langneurons/.env
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="bento-card p-8 rounded-3xl border border-outline-variant/30 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-xs font-label-caps text-tertiary bg-tertiary/10 border border-tertiary/20 px-3 py-1 rounded-full">STEP 03</span>
+                            <span class="material-symbols-outlined text-tertiary text-3xl">rocket_launch</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-on-background mb-4">Boot the Console</h3>
+                        <p class="text-sm text-on-surface-variant leading-relaxed mb-6 opacity-80">
+                            Fire up the FastAPI console server and start orchestrating your multi-agent team inside the interactive graph dashboard.
+                        </p>
+                    </div>
+                    <div class="bg-black/50 p-4 rounded-xl border border-outline-variant/20 font-code-md text-xs text-on-surface-variant">
+                        <span class="text-tertiary">$</span> ./run.sh
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roadmap Section -->
+    <section class="px-margin-mobile py-32 bg-surface-container-lowest/30 md:px-margin-desktop border-b border-outline-variant/10">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-20 md:flex md:items-end md:justify-between">
+                <div class="max-w-2xl">
+                    <span class="font-label-caps text-[12px] text-primary uppercase tracking-[0.3em] font-bold">THE ROAD AHEAD</span>
+                    <h2 class="font-headline-lg text-[36px] md:text-[48px] text-on-background mt-6 leading-tight">What We Are Building Next</h2>
+                    <p class="font-body-md text-xl text-on-surface-variant mt-6 leading-relaxed opacity-80">
+                        We are rapidly expanding the capabilities of LangNeurons. Here's an exclusive sneak peek into the features currently in active development for our next major release.
+                    </p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-md md:grid-cols-3">
+                <!-- Card 1 -->
+                <div class="bento-card p-10 rounded-3xl flex flex-col gap-lg border border-primary/20 bg-primary/5">
+                    <div class="w-14 h-14 bg-primary/20 rounded-2xl flex items-center justify-center">
+                        <span class="material-symbols-outlined text-primary text-3xl">smart_toy</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 mb-4">
+                            <h3 class="font-headline-lg text-2xl text-on-surface">More LLMs</h3>
+                            <span class="px-2 py-0.5 text-[9px] font-bold tracking-widest text-primary bg-primary/10 rounded-full uppercase">In Progress</span>
+                        </div>
+                        <p class="font-body-sm text-on-surface-variant leading-relaxed text-base opacity-80">
+                            Expanding native integration beyond OpenAI to officially support Claude, Gemini, and local open-source models out-of-the-box.
+                        </p>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="bento-card p-10 rounded-3xl flex flex-col gap-lg border border-secondary/20 bg-secondary/5">
+                    <div class="w-14 h-14 bg-secondary/20 rounded-2xl flex items-center justify-center">
+                        <span class="material-symbols-outlined text-secondary text-3xl">extension</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 mb-4">
+                            <h3 class="font-headline-lg text-2xl text-on-surface">MCP Integration</h3>
+                            <span class="px-2 py-0.5 text-[9px] font-bold tracking-widest text-secondary bg-secondary/10 rounded-full uppercase">In Progress</span>
+                        </div>
+                        <p class="font-body-sm text-on-surface-variant leading-relaxed text-base opacity-80">
+                            Implementing the Model Context Protocol (MCP) to seamlessly connect AI swarms to your external data sources and developer tools.
+                        </p>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="bento-card p-10 rounded-3xl flex flex-col gap-lg border border-tertiary/20 bg-tertiary/5">
+                    <div class="w-14 h-14 bg-tertiary/20 rounded-2xl flex items-center justify-center">
+                        <span class="material-symbols-outlined text-tertiary text-3xl">history</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 mb-4">
+                            <h3 class="font-headline-lg text-2xl text-on-surface">Trace Conversations</h3>
+                            <span class="px-2 py-0.5 text-[9px] font-bold tracking-widest text-tertiary bg-tertiary/10 rounded-full uppercase">In Progress</span>
+                        </div>
+                        <p class="font-body-sm text-on-surface-variant leading-relaxed text-base opacity-80">
+                            Advanced debugging and replay tools to trace multi-agent conversation histories, visualize reasoning trees, and rewind failed executions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Section -->
+    <section class="px-margin-mobile py-32 md:px-margin-desktop flex flex-col items-center">
+        <div class="max-w-4xl w-full">
+            <div class="mb-12 text-center">
+                <h3 class="font-headline-lg text-3xl text-on-background">Simple Initialization</h3>
+                <p class="text-on-surface-variant mt-3 text-lg opacity-80">Deploy complex swarms with a few lines of Python.</p>
+            </div>
+            <!-- Terminal -->
+            <div class="bg-[#05070A] rounded-2xl border border-outline-variant/30 overflow-hidden terminal-shadow w-full">
+                <div class="flex items-center justify-between px-md py-4 bg-[#0F1115] border-b border-outline-variant/30">
+                    <div class="flex gap-2.5">
+                        <div class="w-3.5 h-3.5 rounded-full bg-[#FF5F56]/80"></div>
+                        <div class="w-3.5 h-3.5 rounded-full bg-[#FFBD2E]/80"></div>
+                        <div class="w-3.5 h-3.5 rounded-full bg-[#27C93F]/80"></div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[16px] text-on-surface-variant opacity-60">article</span>
+                        <span class="font-label-caps text-[11px] text-on-surface-variant/80 uppercase tracking-widest">langneurons.py</span>
+                    </div>
+                    <button class="flex items-center gap-1.5 px-2.5 py-1 hover:bg-surface-variant rounded transition-colors text-on-surface-variant group">
+                        <span class="material-symbols-outlined text-[18px] group-hover:text-primary transition-colors">content_copy</span>
+                        <span class="text-[10px] font-bold tracking-tighter">COPY</span>
+                    </button>
+                </div>
+                <div class="p-10 font-code-md text-[15px] overflow-x-auto custom-scrollbar leading-relaxed">
+<pre class="text-on-surface"><span class="code-keyword">from</span> langneurons <span class="code-keyword">import</span> Neuron
+
+<span class="code-comment"># Define a specialized neuron with specific constraints</span>
+swarm = Neuron(
+    role=<span class="code-string">"coordinator"</span>,
+    tools=[search, code_exec],
+    memory=<span class="code-string">"isolated"</span>,
+    hierarchy_level=<span class="code-number">1</span>
+)
+
+<span class="code-comment"># Activate the hierarchical cluster</span>
+swarm.activate()</pre>
+                </div>
+                <div class="px-md py-4 bg-[#0F1115] border-t border-outline-variant/30 flex items-center justify-between">
+                    <div class="flex items-center gap-sm">
+                        <span class="material-symbols-outlined text-primary text-sm">terminal</span>
+                        <span class="text-[11px] font-code-md text-on-surface-variant/70">Initializing hierarchical swarm cluster... <span class="text-primary font-bold">DONE</span></span>
+                    </div>
+                    <div class="text-[10px] font-code-md text-on-surface-variant/40 tracking-widest uppercase">ENV: PY 3.11</div>
+                </div>
+            </div>
+            <!-- Partner Note -->
+            <div class="mt-16 p-8 bg-primary-container/5 border border-primary/10 rounded-3xl flex flex-col md:flex-row items-center gap-lg hover:bg-primary-container/10 transition-all cursor-default group">
+                <div class="w-20 h-20 grayscale brightness-200 group-hover:grayscale-0 transition-all opacity-40 group-hover:opacity-100 shrink-0">
+                    <img alt="LangGraph Logo" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGfmeM4l_o4SQgTH5Hn-4HdXpugzHhwGwkKHK3QylUc0PUW0wjqnz9dSY_4os8nL3e82u1DTkAADnMB6E8TSo6VOD-G_7zkr_Jl8vrVAVeMwC-X1tUdexUrfZUqtQPTq7-4wccgQYkiyVEbcOnGI0mrugYNebfY7SsSagtzUpz8DWhL0dzLeRzxnerFDzHKLAzt0MIkwmK5YMbcphH3iLUYJLxpi7WcNLQ2Ld1YYeKY30kGL19Vzsbn6NmT-YwHLwUdt8"/>
+                </div>
+                <div class="text-center md:text-left">
+                    <h4 class="font-bold text-primary font-body-md text-lg mb-1">Powered by LangGraph</h4>
+                    <p class="text-body-sm text-on-surface-variant leading-relaxed opacity-70">Native integration with LangChain's state management engine. Effortlessly scale from single agents to massive swarms with deterministic execution paths.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Integration Logo Cloud -->
+    <section class="px-margin-mobile py-24 text-center md:px-margin-desktop bg-surface-container-lowest/10 border-t border-outline-variant/10">
+        <p class="font-label-caps text-[12px] text-primary uppercase tracking-[0.4em] mb-12 font-bold">Natively Supported LLM Engines</p>
+        <div class="flex flex-wrap justify-center items-center gap-x-20 gap-y-12 opacity-80 hover:opacity-100 transition-all duration-300">
+            <div class="flex flex-col items-center gap-2 group cursor-default">
+                <span class="font-headline-lg-mobile text-[26px] font-extrabold text-on-background tracking-tight group-hover:text-primary transition-colors">Google Gemini</span>
+                <span class="text-[10px] font-code-md text-on-surface-variant opacity-60">Pro & Flash 1.5/2.0</span>
+            </div>
+            <div class="flex flex-col items-center gap-2 group cursor-default">
+                <span class="font-headline-lg-mobile text-[26px] font-extrabold text-on-background tracking-tight group-hover:text-primary transition-colors">OpenAI GPT</span>
+                <span class="text-[10px] font-code-md text-on-surface-variant opacity-60">GPT-4o & GPT-4-turbo</span>
+            </div>
+            <div class="flex flex-col items-center gap-2 group cursor-default">
+                <span class="font-headline-lg-mobile text-[26px] font-extrabold text-on-background tracking-tight group-hover:text-primary transition-colors">Moonshot AI</span>
+                <span class="text-[10px] font-code-md text-on-surface-variant opacity-60">Kimi-Chat Swarms</span>
+            </div>
+            <div class="flex flex-col items-center gap-2 group cursor-default">
+                <span class="font-headline-lg-mobile text-[26px] font-extrabold text-on-background tracking-tight group-hover:text-primary transition-colors">OpenRouter</span>
+                <span class="text-[10px] font-code-md text-on-surface-variant opacity-60">Llama-3, Claude-3.5 & DeepSeek</span>
+            </div>
+        </div>
+    </section>
+</main>
+<!-- Footer -->
+<footer class="w-full pt-32 pb-16 px-margin-mobile md:px-margin-desktop bg-background border-t border-outline-variant/20">
+    <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start gap-16 mb-24">
+            <div class="flex flex-col gap-6 max-w-sm">
+                <div class="flex items-center gap-3 select-none self-start">
+                    <!-- Hexagonal SVG Logo -->
+                    <svg class="h-10 w-10 text-primary" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Bottom-Left Node Line -->
+                        <line x1="39" y1="72" x2="20" y2="88" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+                        <circle cx="20" cy="88" r="7" fill="currentColor" />
+                        
+                        <!-- Bottom-Right Node Line -->
+                        <line x1="81" y1="72" x2="100" y2="88" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+                        <circle cx="100" cy="88" r="7" fill="currentColor" />
+                        
+                        <!-- Hexagon Body -->
+                        <polygon points="60,36 81,48 81,72 60,84 39,72 39,48" fill="currentColor" />
+                        
+                        <!-- Top Node Line -->
+                        <line x1="60" y1="60" x2="60" y2="16" stroke="currentColor" stroke-width="5" stroke-linecap="round" />
+                        <circle cx="60" cy="16" r="7" fill="currentColor" />
+                        
+                        <!-- Center Circle -->
+                        <circle cx="60" cy="60" r="7" fill="#fff" />
+                    </svg>
+                    <div class="flex flex-col justify-center leading-none">
+                        <span class="font-headline-lg text-2xl font-bold tracking-tight text-on-background">LangNeurons</span>
+                        <span class="font-label-caps text-[9px] text-primary tracking-[0.25em] uppercase mt-0.5">Brain of LLMs</span>
+                    </div>
+                </div>
+                <p class="text-body-sm text-on-surface-variant leading-relaxed opacity-70">
+                    Empowering developers to build the next generation of hierarchical multi-agent systems with precision, security, and enterprise-grade reliability.
+                </p>
+                <div class="flex gap-4 mt-2">
+                    <a class="w-10 h-10 rounded-full border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:border-primary hover:text-primary transition-all" href="#">
+                        <span class="material-symbols-outlined text-[20px]">code</span>
+                    </a>
+                    <a class="w-10 h-10 rounded-full border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:border-primary hover:text-primary transition-all" href="#">
+                        <span class="material-symbols-outlined text-[20px]">chat</span>
+                    </a>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-12 sm:gap-16">
+                <div class="flex flex-col gap-6">
+                    <span class="font-label-caps text-[11px] text-on-surface font-black uppercase tracking-[0.2em]">Product</span>
+                    <div class="flex flex-col gap-4 text-sm font-medium">
+                        <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Platform</a>
+                        <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Ecosystem</a>
+                        <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Integrations</a>
+                        <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Security</a>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-6">
+                    <span class="font-label-caps text-[11px] text-on-surface font-black uppercase tracking-[0.2em]">Resources</span>
+                    <div class="flex flex-col gap-4 text-sm font-medium">
+                        <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Documentation</a>
+                        <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Blog</a>
+                        <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Changelog</a>
+                        <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Examples</a>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-6">
+                    <span class="font-label-caps text-[11px] text-on-surface font-black uppercase tracking-[0.2em]">Company</span>
+                    <div class="flex flex-col gap-4 text-sm font-medium">
+                        <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">About Us</a>
+                        <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Careers</a>
+                        <a class="text-on-surface-variant hover:text-primary transition-colors" href="mailto:swapniljytkd888@gmail.com">Contact</a>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-6">
+                    <span class="font-label-caps text-[11px] text-on-surface font-black uppercase tracking-[0.2em]">Connect</span>
+                    <div class="flex flex-col gap-4 text-sm font-medium">
+                        <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">GitHub</a>
+                        <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Discord</a>
+                        <a class="text-on-surface-variant hover:text-primary transition-colors" href="#">X (Twitter)</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="pt-10 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-8">
+            <p class="font-body-sm text-[13px] text-on-surface-variant/50">
+                © 2024 LangNeurons Inc. All rights reserved. Built for high-reliability systems.
+            </p>
+            <div class="flex gap-8">
+                <a class="text-on-surface-variant/50 hover:text-primary transition-colors text-[13px] font-medium" href="/privacy.html">Privacy Policy</a>
+                <a class="text-on-surface-variant/50 hover:text-primary transition-colors text-[13px] font-medium" href="#">Terms of Service</a>
+                <a class="text-on-surface-variant/50 hover:text-primary transition-colors text-[13px] font-medium" href="#">Cookie Policy</a>
+            </div>
+        </div>
+    </div>
+</footer>
+<script>
+    function toggleDrawer() {
+        const drawer = document.getElementById('main-drawer');
+        const overlay = document.getElementById('drawer-overlay');
+        
+        if (drawer.classList.contains('-translate-x-full')) {
+            drawer.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.add('opacity-100'), 10);
+            document.body.classList.add('overflow-hidden');
+        } else {
+            drawer.classList.add('-translate-x-full');
+            overlay.classList.remove('opacity-100');
+            setTimeout(() => {
+                if (drawer.classList.contains('-translate-x-full')) {
+                    overlay.classList.add('hidden');
+                }
+            }, 300);
+            document.body.classList.remove('overflow-hidden');
+        }
+    }
+
+    // Header scroll interaction
+    window.addEventListener('scroll', () => {
+        const header = document.querySelector('header');
+        if (window.scrollY > 40) {
+            header.classList.add('h-16', 'bg-background/95', 'border-outline-variant/50');
+            header.classList.remove('h-20', 'bg-background/90', 'border-outline-variant/30');
+        } else {
+            header.classList.remove('h-16', 'bg-background/95', 'border-outline-variant/50');
+            header.classList.add('h-20', 'bg-background/90', 'border-outline-variant/30');
+        }
+    });
+</script>
+<script src="/auth-helper.js"></script>
+</body>
+</html>
