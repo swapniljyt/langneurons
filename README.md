@@ -257,7 +257,7 @@ Each agent type maps to a fixed set of capability tags, which determines exactly
 Simply clone the repository and run the setup script. It automatically verifies Python, installs virtual environment dependencies, installs/starts Redis server, and prepares your `.env` template:
 
 ```bash
-git clone https://github.com/swapniljyot/langneurons.git
+git clone https://github.com/swapniljyt/langneurons.git
 cd langneurons
 ./setup.sh
 ```
