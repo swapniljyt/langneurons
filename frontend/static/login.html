@@ -246,6 +246,23 @@
                 <div id="login-error" class="hidden text-xs text-red-400 bg-red-950/20 border border-red-900/30 p-3 rounded-lg font-mono">
                     Invalid credentials. Please try again.
                 </div>
+
+                <!-- Collapsible Backend Host Config -->
+                <div class="pt-xs">
+                    <button type="button" id="toggle-backend-config" class="flex items-center gap-xs font-label-caps text-[10px] text-primary hover:underline transition-all opacity-80 hover:opacity-100 cursor-pointer" style="color: rgb(0, 255, 157);">
+                        <span class="material-symbols-outlined text-[14px]">settings_ethernet</span>
+                        Configure Backend Connection
+                    </button>
+                    <div id="backend-config-container" class="hidden mt-sm p-sm bg-surface-container rounded-lg technical-border space-y-xs">
+                        <label for="backend-url-input" class="font-label-caps text-[9px] text-on-surface-variant block">DECOUPLED BACKEND HOST URL</label>
+                        <div class="flex gap-xs">
+                            <input id="backend-url-input" class="flex-grow bg-surface-container-low border border-outline-variant rounded-lg px-sm py-1 font-body-sm text-xs text-on-surface placeholder:text-outline-variant transition-all input-focus" placeholder="e.g. https://backend.railway.app">
+                            <button type="button" id="save-backend-btn" class="btn-glass-green font-label-caps text-[9px] px-sm py-1 rounded-lg cursor-pointer">
+                                SAVE
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 
                 <button type="submit" id="submit-btn" class="w-full mt-md btn-glass-green font-label-caps text-label-caps py-sm px-md rounded-lg transition-all active:scale-[0.98] cursor-pointer">
                     SIGN IN
@@ -276,6 +293,37 @@
             const urlParams = new URLSearchParams(window.location.search);
             window.location.href = urlParams.get('redirect') || '/console.html';
         }
+
+        // Backend host configuration logic
+        const toggleBackend = document.getElementById('toggle-backend-config');
+        const backendConfigContainer = document.getElementById('backend-config-container');
+        const backendUrlInput = document.getElementById('backend-url-input');
+        const saveBackendBtn = document.getElementById('save-backend-btn');
+
+        // Prepopulate current backend host
+        backendUrlInput.value = localStorage.getItem('LANGNEURONS_BACKEND_URL') || '';
+
+        toggleBackend.addEventListener('click', (e) => {
+            e.preventDefault();
+            backendConfigContainer.classList.toggle('hidden');
+        });
+
+        saveBackendBtn.addEventListener('click', () => {
+            const url = backendUrlInput.value.trim();
+            if (url) {
+                // Ensure proper protocol and remove trailing slash
+                let formattedUrl = url.replace(/\/$/, '');
+                if (!/^https?:\/\//i.test(formattedUrl)) {
+                    formattedUrl = 'https://' + formattedUrl;
+                }
+                localStorage.setItem('LANGNEURONS_BACKEND_URL', formattedUrl);
+                alert(`Backend URL configured and saved: ${formattedUrl}`);
+            } else {
+                localStorage.removeItem('LANGNEURONS_BACKEND_URL');
+                alert('Backend URL cleared. Using default Vercel host.');
+            }
+            window.location.reload();
+        });
 
         const toggleAuth = document.getElementById('toggle-auth');
         const headerTitle = document.getElementById('auth-title');
