@@ -620,6 +620,29 @@ async function handleStartCompile() {
 
     const sessionId = (elements.sessionIdInput ? elements.sessionIdInput.value.trim() : '') || 'ecommerce_build_session';
 
+    // ── Pre-check LLM API Keys before compilation ────────────────────────────
+    try {
+        const keysResp = await fetch(`${API_BASE}/api/settings/keys`);
+        const keysData = await keysResp.json();
+        if (keysData.success && keysData.keys) {
+            const k = keysData.keys;
+            const activeProvider = k.default_provider || 'moonshot';
+            let keyConfigured = false;
+            if (activeProvider === 'openai') keyConfigured = k.openai_configured;
+            else if (activeProvider === 'gemini') keyConfigured = k.gemini_configured;
+            else if (activeProvider === 'moonshot') keyConfigured = k.moonshot_configured;
+            else if (activeProvider === 'openrouter') keyConfigured = k.openrouter_configured;
+            else if (activeProvider === 'bedrock') keyConfigured = k.bedrock_configured;
+            
+            if (!keyConfigured) {
+                alert(`⚠️ Missing API Key: The active LLM provider is "${activeProvider.toUpperCase()}", but no API key has been configured. Please navigate to the "API Connection" tab and add your API keys for the orchestration.`);
+                return;
+            }
+        }
+    } catch (e) {
+        console.warn("Failed to pre-check API keys status:", e);
+    }
+
     // Persist to state
     appState.formationBrief = brief;
     appState.sessionId = sessionId;
@@ -684,7 +707,14 @@ async function handleStartCompile() {
     appendTerminalLine('▶ Sending swarm tree to compiler...', 'status');
     appendTerminalLine(`  Session: ${sessionId} | Thinking: ${appState.thinkingMode ? 'ON' : 'OFF'}`, 'info');
 
+    let compileTimeoutMsg = null;
     try {
+        // Set a timer to notify the user if API requests/orchestration take longer
+        compileTimeoutMsg = setTimeout(() => {
+            appendTerminalLine('⚠️ API orchestration is taking some time. Please wait, sending multiple LLM requests...', 'info');
+            appendTelemetryLog('⚠️ API requests are taking longer than expected. Still waiting...', 'info');
+        }, 5000);
+
         // POST script to server → get back script_path for WS runner
         const resp = await fetch(`${API_BASE}/api/swarm/compile-run`, {
             method: 'POST',
@@ -695,6 +725,8 @@ async function handleStartCompile() {
                 thinking_mode: appState.thinkingMode
             })
         });
+        
+        if (compileTimeoutMsg) clearTimeout(compileTimeoutMsg);
         const data = await resp.json();
 
         if (!data.success) {
@@ -711,6 +743,7 @@ async function handleStartCompile() {
         runViaWebSocket(data.script_path, sessionId);
 
     } catch (err) {
+        if (compileTimeoutMsg) clearTimeout(compileTimeoutMsg);
         appendTerminalLine(`✗ Network error: ${err.message}`, 'error');
         resetCompileBtn();
     }
