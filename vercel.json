@@ -16,8 +16,36 @@
       "destination": "/frontend/static/js/:path*"
     },
     {
-      "source": "/:page(login|console|docs|blog|ecosystem|integrations|privacy|product)",
-      "destination": "/frontend/static/:page.html"
+      "source": "/login",
+      "destination": "/frontend/static/login.html"
+    },
+    {
+      "source": "/console",
+      "destination": "/frontend/static/console.html"
+    },
+    {
+      "source": "/docs",
+      "destination": "/frontend/static/docs.html"
+    },
+    {
+      "source": "/blog",
+      "destination": "/frontend/static/blog.html"
+    },
+    {
+      "source": "/ecosystem",
+      "destination": "/frontend/static/ecosystem.html"
+    },
+    {
+      "source": "/integrations",
+      "destination": "/frontend/static/integrations.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/frontend/static/privacy.html"
+    },
+    {
+      "source": "/product",
+      "destination": "/frontend/static/product.html"
     },
     {
       "source": "/:path*",
