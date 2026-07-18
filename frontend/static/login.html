@@ -269,6 +269,8 @@
     </div>
 
     <script>
+        const API_BASE = localStorage.getItem('LANGNEURONS_BACKEND_URL') || window.location.origin;
+
         // Auto-redirect if already logged in
         if (sessionStorage.getItem('token')) {
             const urlParams = new URLSearchParams(window.location.search);
@@ -318,7 +320,7 @@
             errorDiv.classList.add('hidden');
 
             try {
-                const response = await fetch(`${window.location.origin}/api/auth/login`, {
+                const response = await fetch(`${API_BASE}/api/auth/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password })
