@@ -29,6 +29,10 @@ export const elements = {
     sandboxToastMsg: document.getElementById('sandbox-toast-msg'),
     sandboxToastViewBtn: document.getElementById('sandbox-toast-view-btn'),
     sandboxToastCloseBtn: document.getElementById('sandbox-toast-close-btn'),
+    agentCodeToast: document.getElementById('agent-code-toast'),
+    agentToastMsg: document.getElementById('agent-toast-msg'),
+    agentToastViewBtn: document.getElementById('agent-toast-view-btn'),
+    agentToastCloseBtn: document.getElementById('agent-toast-close-btn'),
     
     // Workspace Try Out
     briefInput: document.getElementById('formation-brief'),

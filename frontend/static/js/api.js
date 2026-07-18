@@ -212,14 +212,14 @@ export function triggerSandboxNotification(fileName, filePath) {
     loadSandboxExplorerTree();
 
     // 3. Display Floating Toast Notification
-    if (elements.sandboxCodeToast && elements.sandboxToastMsg) {
-        elements.sandboxToastMsg.innerText = `Check the code! Agent created/modified: ${fileName}`;
-        elements.sandboxCodeToast.classList.remove('hidden', '-translate-y-4');
-        elements.sandboxCodeToast.classList.add('translate-y-0');
+    if (elements.agentCodeToast && elements.agentToastMsg) {
+        elements.agentToastMsg.innerText = `Check the code! Agent created/modified: ${fileName}`;
+        elements.agentCodeToast.classList.remove('hidden', '-translate-y-4');
+        elements.agentCodeToast.classList.add('translate-y-0');
 
         // Handle "View Code" button click on toast
-        if (elements.sandboxToastViewBtn) {
-            elements.sandboxToastViewBtn.onclick = () => {
+        if (elements.agentToastViewBtn) {
+            elements.agentToastViewBtn.onclick = () => {
                 // Switch to Sandbox tab & clear blink
                 const sandboxTabBtn = document.querySelector('[data-tab="sandbox"]');
                 if (sandboxTabBtn) sandboxTabBtn.click();
@@ -229,20 +229,20 @@ export function triggerSandboxNotification(fileName, filePath) {
                 openFileInMonaco({ name: fileName, path: filePath, relative_path: fileName });
 
                 // Hide toast
-                elements.sandboxCodeToast.classList.add('hidden', '-translate-y-4');
+                elements.agentCodeToast.classList.add('hidden', '-translate-y-4');
             };
         }
 
-        if (elements.sandboxToastCloseBtn) {
-            elements.sandboxToastCloseBtn.onclick = () => {
-                elements.sandboxCodeToast.classList.add('hidden', '-translate-y-4');
+        if (elements.agentToastCloseBtn) {
+            elements.agentToastCloseBtn.onclick = () => {
+                elements.agentCodeToast.classList.add('hidden', '-translate-y-4');
             };
         }
 
         // Auto-hide toast after 8 seconds
         setTimeout(() => {
-            if (elements.sandboxCodeToast) {
-                elements.sandboxCodeToast.classList.add('hidden', '-translate-y-4');
+            if (elements.agentCodeToast) {
+                elements.agentCodeToast.classList.add('hidden', '-translate-y-4');
             }
         }, 8000);
     }
