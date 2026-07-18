@@ -1,0 +1,58 @@
+# ══════════════════════════════════════════════════════════════════
+# LangNeurons — Root Dependency List for Vercel
+# ══════════════════════════════════════════════════════════════════
+
+# ── Core LangChain / LangGraph stack ──────────────────────────────
+langchain>=0.3.0
+langchain-core>=0.3.0
+langgraph>=0.3.0
+
+# ── LLM Providers ────────────────────
+langchain-openrouter>=0.1.0
+langchain-moonshot>=0.1.0
+langchain-anthropic>=0.3.0
+langchain-openai>=0.3.0
+langchain-google-genai>=2.0.0
+google-genai>=1.0.0
+langchain-aws>=1.5.0
+boto3>=1.43.0
+
+# ── Web Search tool ───────────────────────────────────────────────
+langchain-tavily>=0.2.0
+
+# ── Redis (agent memory + session persistence) ────────────────────
+redis>=5.0.0
+
+# ── Terminal UI ───────────────────────────────────────────────────
+rich>=13.7.0
+
+# ── Data validation ───────────────────────────────────────────────
+pydantic>=2.7.0
+
+# ── Token counting ────────────────────────────────────────────────
+tiktoken>=0.7.0
+
+# ── Environment variable loading ──────────────────────────────────
+python-dotenv>=1.0.0
+
+# ── Retry logic ───────────────────────────────────────────────────
+tenacity>=8.5.0
+
+# ── Document parsing tools ────────────────────────────────────────
+PyPDF2>=3.0.0
+python-docx>=1.1.0
+
+# ── PDF generation (resume/report export) ────────────────────────
+fpdf2>=2.7.0
+
+# ── Markdown rendering ────────────────────────────────────────────
+markdown>=3.6
+
+# ── HTTP client ────────────────
+httpx>=0.27.0
+
+# ── Web Console / FastAPI Server ──────────────────────────────
+fastapi>=0.110.0
+uvicorn[standard]>=0.28.0
+websockets>=12.0
+pymysql>=1.1.1

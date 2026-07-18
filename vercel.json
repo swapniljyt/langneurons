@@ -1,6 +1,27 @@
 {
   "version": 2,
-  "name": "langneurons-frontend",
+  "name": "langneurons",
   "cleanUrls": true,
-  "outputDirectory": "frontend/static"
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/ws/:path*",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/js/:path*",
+      "destination": "/frontend/static/js/:path*"
+    },
+    {
+      "source": "/:page(login|console|docs|blog|ecosystem|integrations|privacy|product)",
+      "destination": "/frontend/static/:page.html"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/frontend/static/:path*"
+    }
+  ]
 }
