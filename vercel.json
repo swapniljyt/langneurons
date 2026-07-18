@@ -2,18 +2,5 @@
   "version": 2,
   "name": "langneurons-frontend",
   "cleanUrls": true,
-  "routes": [
-    {
-      "src": "/js/(.*)",
-      "dest": "/frontend/static/js/$1"
-    },
-    {
-      "src": "/(login|console|docs|blog|ecosystem|integrations|privacy|product)",
-      "dest": "/frontend/static/$1.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/static/$1"
-    }
-  ]
+  "outputDirectory": "frontend/static"
 }
