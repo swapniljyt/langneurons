@@ -2,18 +2,18 @@
   "version": 2,
   "name": "langneurons-frontend",
   "cleanUrls": true,
-  "rewrites": [
+  "routes": [
     {
-      "source": "/js/(.*)",
-      "destination": "/frontend/static/js/$1"
+      "src": "/js/(.*)",
+      "dest": "/frontend/static/js/$1"
     },
     {
-      "source": "/(login|console|docs|blog|ecosystem|integrations|privacy|product)",
-      "destination": "/frontend/static/$1.html"
+      "src": "/(login|console|docs|blog|ecosystem|integrations|privacy|product)",
+      "dest": "/frontend/static/$1.html"
     },
     {
-      "source": "/(.*)",
-      "destination": "/frontend/static/$1"
+      "src": "/(.*)",
+      "dest": "/frontend/static/$1"
     }
   ]
 }
