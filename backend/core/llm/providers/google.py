@@ -18,7 +18,7 @@ class GoogleProvider(BaseLLMProvider):
         if not api_key:
             raise ValueError("GEMINI_API_KEY environment variable is missing.")
 
-        model_name = os.getenv("MODEL_ROUTER_GEMINI", "gemini-2.5-flash")
+        model_name = os.getenv("MODEL_ROUTER_GEMINI") or os.getenv("MODEL_GEMINI_ROUTER") or "gemini-2.5-flash"
 
         return ChatGoogleGenerativeAI(
             model=model_name,
@@ -36,7 +36,7 @@ class GoogleProvider(BaseLLMProvider):
         if not api_key:
             raise ValueError("GEMINI_API_KEY environment variable is missing.")
 
-        model_name = os.getenv("MODEL_EXEC_GEMINI", "gemini-2.5-pro")
+        model_name = os.getenv("MODEL_EXEC_GEMINI") or os.getenv("MODEL_GEMINI") or "gemini-2.5-pro"
 
         return ChatGoogleGenerativeAI(
             model=model_name,

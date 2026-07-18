@@ -18,7 +18,7 @@ class OpenAIProvider(BaseLLMProvider):
         if not api_key:
             raise ValueError("OPENAI_API_KEY environment variable is missing.")
 
-        model_name = os.getenv("MODEL_ROUTER_OPENAI", "gpt-4o-mini")
+        model_name = os.getenv("MODEL_ROUTER_OPENAI") or os.getenv("MODEL_OPENAI_ROUTER") or "gpt-4o-mini"
 
         return ChatOpenAI(
             model=model_name,
@@ -36,7 +36,7 @@ class OpenAIProvider(BaseLLMProvider):
         if not api_key:
             raise ValueError("OPENAI_API_KEY environment variable is missing.")
 
-        model_name = os.getenv("MODEL_EXEC_OPENAI", "gpt-4o")
+        model_name = os.getenv("MODEL_EXEC_OPENAI") or os.getenv("MODEL_OPENAI") or "gpt-4o"
 
         return ChatOpenAI(
             model=model_name,

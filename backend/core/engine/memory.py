@@ -14,17 +14,28 @@ ENV_PATH = BASE_DIR / ".env"
 load_dotenv(dotenv_path=ENV_PATH, override=True)
 
 class RedisClient:
-    def __init__(self, db: int = 0):
+    def __init__(self, db: int = 0, decode_responses: bool = False):
         """
         Initialize Redis client on class instantiation.
+        Supports REDIS_URL or host/port/password environment variables.
         """
         try:
-            self.client = Redis(
-                host=os.getenv("REDIS_HOST", "localhost"),
-                port=int(os.getenv("REDIS_PORT", 6379)),
-                password=os.getenv("REDIS_PASSWORD", "testpass"),
-                db=db,
-            )
+            redis_url = os.getenv("REDIS_URL")
+            if redis_url:
+                self.client = Redis.from_url(redis_url, db=db, decode_responses=decode_responses)
+            else:
+                host = os.getenv("REDIS_HOST", "localhost")
+                port = int(os.getenv("REDIS_PORT", 6379))
+                password = os.getenv("REDIS_PASSWORD")
+                if password == "":
+                    password = None
+                self.client = Redis(
+                    host=host,
+                    port=port,
+                    password=password,
+                    db=db,
+                    decode_responses=decode_responses,
+                )
         except Exception as e:
             print("❌ Error initializing Redis client:", e)
             self.client = None

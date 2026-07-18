@@ -549,15 +549,25 @@ export function resetNeuronLayout() {
  * Activates or stops the rotating border spinner on a specific neuron card.
  * @param {string|null} activeNeuronName - The common_name of the agent, or null to clear all.
  */
-export function setNeuronThinking(activeNeuronName) {
+export function setNeuronThinking(activeNeuronName, isThinking = null) {
     const canvas = elements.neuronNodesContainer;
     if (!canvas) return;
 
     const spinners = canvas.querySelectorAll('.neuron-thinking-spinner');
     spinners.forEach(spin => {
         const name = spin.dataset.spinnerFor;
-        const shouldSpin = activeNeuronName && name.toLowerCase() === activeNeuronName.toLowerCase();
-        spin.classList.toggle('thinking', shouldSpin);
+        if (!name) return;
+
+        if (isThinking !== null) {
+            // Target specific neuron state change
+            if (name.toLowerCase() === activeNeuronName?.toLowerCase()) {
+                spin.classList.toggle('thinking', isThinking);
+            }
+        } else {
+            // Legacy/global behavior: set this one active, clear others
+            const shouldSpin = activeNeuronName && name.toLowerCase() === activeNeuronName.toLowerCase();
+            spin.classList.toggle('thinking', shouldSpin);
+        }
     });
 }
 

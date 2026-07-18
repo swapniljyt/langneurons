@@ -5,11 +5,12 @@ import { loadDocs } from './api.js?v=20260717l';
 import { initSandboxIDE, loadSandboxExplorerTree } from './sandbox.js?v=20260717l';
 import { createNode, drawConnections, setSelectedNode, updateNodeCardCompiled } from './canvas.js?v=20260717l';
 import { saveNodeSettings, closeInspectorModal, switchInspectorTab, openInspector } from './inspector.js?v=20260717l';
-import { renderNeuronTree, resetNeuronLayout } from './neurons.js?v=20260717l';
+import { renderNeuronTree, resetNeuronLayout } from './neurons.js?v=20260718b';
 import { startSwarmRun, sendTerminalInput, clearTerminal, toggleTerminalDrawer, appendTerminalLine } from './terminal.js?v=20260717l';
 import { Viewport } from './viewport.js?v=20260717l';
-import { initChatWorkspace, toggleChatPanel, triggerSwarmExecution, processChatStreamLog } from './chat.js?v=20260717o';
-import { appendTelemetryLog } from './telemetry.js?v=20260717o';
+import { initChatWorkspace, toggleChatPanel, triggerSwarmExecution, processChatStreamLog } from './chat.js?v=20260718b';
+import { appendTelemetryLog } from './telemetry.js?v=20260718b';
+import { initConnectAPI } from './api_connect.js?v=20260718b';
 
 // Expose createNode to window scope for Playwright testing
 window.createNode = createNode;
@@ -41,10 +42,20 @@ export function selectTab(tabId) {
     }
 
     if (tabId === 'docs') loadDocs();
-    if (tabId === 'sandbox') loadSandboxExplorerTree();
+    if (tabId === 'sandbox') {
+        loadSandboxExplorerTree();
+        // Clear nav blink when user opens sandbox tab
+        const sandboxNavBtn = document.getElementById('sandbox-nav-btn');
+        if (sandboxNavBtn) sandboxNavBtn.classList.remove('sandbox-nav-blink');
+    }
     if (tabId === 'code') generateSwarmCode();
 
     if (tabId === 'settings') {
+        // Initialize the Connect API card UI once on first open
+        if (!window._connectAPIInited) {
+            window._connectAPIInited = true;
+            initConnectAPI();
+        }
         if (elements.formationBriefText) {
             elements.formationBriefText.value = appState.formationBrief || '';
         }

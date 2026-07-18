@@ -91,8 +91,9 @@ def inspect_neuron(session_id: str, neuron_name: str):
         
     # Context/Metadata from Redis
     try:
-        import redis
-        r = redis.Redis(host='localhost', port=6379, db=0, password='testpass')
+        from core.engine.memory import RedisClient
+        redis_instance = RedisClient()
+        r = redis_instance.get_client()
         state_data = r.get(f"neuron:{session_id}:{neuron.common_name}")
         if state_data:
             state = json.loads(state_data.decode('utf-8'))

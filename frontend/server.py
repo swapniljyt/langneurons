@@ -446,8 +446,9 @@ def get_compile_results(session_id: str):
       neuron_role:{session_id}:{common_name}  → lightweight role update (dynamic_name + system_prompt)
     """
     try:
-        import redis as redis_lib
-        r = redis_lib.Redis(host="localhost", port=6379, decode_responses=True)
+        from core.engine.memory import RedisClient
+        redis_instance = RedisClient(decode_responses=True)
+        r = redis_instance.get_client()
 
         # Collect all neuron keys for this session
         neuron_keys = r.keys(f"neuron:{session_id}:*")
@@ -758,8 +759,9 @@ def ai_assist_code(req: AiAssistRequest):
 @app.get("/api/cost/metrics")
 def get_cost_metrics(session_id: str = "ecommerce_build_session"):
     try:
-        import redis as redis_lib
-        r = redis_lib.Redis(host="localhost", port=6379, decode_responses=True)
+        from core.engine.memory import RedisClient
+        redis_instance = RedisClient(decode_responses=True)
+        r = redis_instance.get_client()
         key = f"langtrace:{session_id}:calls"
         raw_list = r.lrange(key, 0, -1)
         
@@ -830,9 +832,25 @@ class ApiKeysRequest(BaseModel):
     gemini_key: Optional[str] = None
     moonshot_key: Optional[str] = None
     openrouter_key: Optional[str] = None
+    # Amazon Bedrock
+    aws_access_key: Optional[str] = None
+    aws_secret_key: Optional[str] = None
+    aws_region: Optional[str] = None
+    # Active provider selection
     default_provider: Optional[str] = "moonshot"
+    # Per-provider router + exec models
     router_model: Optional[str] = None
     exec_model: Optional[str] = None
+    openai_router_model: Optional[str] = None
+    openai_exec_model: Optional[str] = None
+    gemini_router_model: Optional[str] = None
+    gemini_exec_model: Optional[str] = None
+    moonshot_router_model: Optional[str] = None
+    moonshot_exec_model: Optional[str] = None
+    openrouter_router_model: Optional[str] = None
+    openrouter_exec_model: Optional[str] = None
+    bedrock_router_model: Optional[str] = None
+    bedrock_exec_model: Optional[str] = None
     redis_host: Optional[str] = None
     redis_port: Optional[str] = None
     redis_password: Optional[str] = None
@@ -862,36 +880,36 @@ def get_api_keys_status():
 
     provider = os.environ.get("LLM_PROVIDER", os.environ.get("DEFAULT_LLM_PROVIDER", "moonshot"))
 
-    # Get models based on provider
-    router_model = ""
-    exec_model = ""
-    if provider == "moonshot":
-        router_model = os.environ.get("MODEL_ROUTER_MOONSHOT", "kimi-k2.5")
-        exec_model = os.environ.get("MODEL_EXEC_MOONSHOT", "kimi-k2.5")
-    elif provider == "openai":
-        router_model = os.environ.get("MODEL_OPENAI_ROUTER", "gpt-4o-mini")
-        exec_model = os.environ.get("MODEL_OPENAI", "gpt-4o-mini")
-    elif provider == "gemini":
-        router_model = os.environ.get("MODEL_GEMINI_ROUTER", "gemini-2.5-flash")
-        exec_model = os.environ.get("MODEL_GEMINI", "gemini-2.5-pro")
-    elif provider == "openrouter":
-        router_model = os.environ.get("MODEL_ROUTER_OPENROUTER", "deepseek/deepseek-chat")
-        exec_model = os.environ.get("MODEL_EXEC_OPENROUTER", "deepseek/deepseek-chat")
-
     return {
         "success": True,
         "keys": {
+            # Configured flags
             "openai_configured": bool(os.environ.get("OPENAI_API_KEY")),
             "gemini_configured": bool(os.environ.get("GEMINI_API") or os.environ.get("GEMINI_API_KEY")),
             "moonshot_configured": bool(os.environ.get("MOONSHOT_API_KEY")),
             "openrouter_configured": bool(os.environ.get("OPENROUTER_API_KEY")),
+            "bedrock_configured": bool(os.environ.get("AWS_ACCESS_KEY_ID")),
+            # Masked keys
             "openai_key_masked": mask_key(os.environ.get("OPENAI_API_KEY")),
             "gemini_key_masked": mask_key(os.environ.get("GEMINI_API") or os.environ.get("GEMINI_API_KEY")),
             "moonshot_key_masked": mask_key(os.environ.get("MOONSHOT_API_KEY")),
             "openrouter_key_masked": mask_key(os.environ.get("OPENROUTER_API_KEY")),
+            "aws_access_key_masked": mask_key(os.environ.get("AWS_ACCESS_KEY_ID")),
+            "aws_region": os.environ.get("AWS_DEFAULT_REGION", ""),
+            # Active provider
             "default_provider": provider,
-            "router_model": router_model,
-            "exec_model": exec_model,
+            # Per-provider models
+            "openai_router_model": os.environ.get("MODEL_OPENAI_ROUTER", "gpt-4o-mini"),
+            "openai_exec_model": os.environ.get("MODEL_OPENAI", "gpt-4o"),
+            "gemini_router_model": os.environ.get("MODEL_GEMINI_ROUTER", "gemini-2.5-flash"),
+            "gemini_exec_model": os.environ.get("MODEL_GEMINI", "gemini-2.5-pro"),
+            "moonshot_router_model": os.environ.get("MODEL_ROUTER_MOONSHOT", "kimi-k2.5"),
+            "moonshot_exec_model": os.environ.get("MODEL_EXEC_MOONSHOT", "kimi-k2.5"),
+            "openrouter_router_model": os.environ.get("MODEL_ROUTER_OPENROUTER", "deepseek/deepseek-chat"),
+            "openrouter_exec_model": os.environ.get("MODEL_EXEC_OPENROUTER", "deepseek/deepseek-chat"),
+            "bedrock_router_model": os.environ.get("MODEL_BEDROCK_ROUTER", "amazon.nova-pro-v1:0"),
+            "bedrock_exec_model": os.environ.get("MODEL_BEDROCK_EXEC", "anthropic.claude-3-5-sonnet-20241022-v2:0"),
+            # Redis
             "redis_host": redis_host,
             "redis_port": redis_port,
             "redis_password": os.environ.get("REDIS_PASSWORD", "")
@@ -910,69 +928,77 @@ def save_api_keys(req: ApiKeysRequest):
                     k, v = line.split("=", 1)
                     env_vars[k.strip()] = v.strip().strip('"\'')
 
-    # Update keys
+    # ── API Keys ─────────────────────────────────────────────────────────────
     if req.openai_key and req.openai_key.strip():
         os.environ["OPENAI_API_KEY"] = req.openai_key.strip()
         env_vars["OPENAI_API_KEY"] = req.openai_key.strip()
     if req.gemini_key and req.gemini_key.strip():
-        os.environ["GEMINI_API"] = req.gemini_key.strip()
-        env_vars["GEMINI_API"] = req.gemini_key.strip()
-        os.environ["GEMINI_API_KEY"] = req.gemini_key.strip()
-        env_vars["GEMINI_API_KEY"] = req.gemini_key.strip()
+        for k in ("GEMINI_API", "GEMINI_API_KEY"):
+            os.environ[k] = req.gemini_key.strip()
+            env_vars[k] = req.gemini_key.strip()
     if req.moonshot_key and req.moonshot_key.strip():
         os.environ["MOONSHOT_API_KEY"] = req.moonshot_key.strip()
         env_vars["MOONSHOT_API_KEY"] = req.moonshot_key.strip()
     if req.openrouter_key and req.openrouter_key.strip():
         os.environ["OPENROUTER_API_KEY"] = req.openrouter_key.strip()
         env_vars["OPENROUTER_API_KEY"] = req.openrouter_key.strip()
+    # Amazon Bedrock credentials
+    if req.aws_access_key and req.aws_access_key.strip():
+        os.environ["AWS_ACCESS_KEY_ID"] = req.aws_access_key.strip()
+        env_vars["AWS_ACCESS_KEY_ID"] = req.aws_access_key.strip()
+    if req.aws_secret_key and req.aws_secret_key.strip():
+        os.environ["AWS_SECRET_ACCESS_KEY"] = req.aws_secret_key.strip()
+        env_vars["AWS_SECRET_ACCESS_KEY"] = req.aws_secret_key.strip()
+    if req.aws_region and req.aws_region.strip():
+        os.environ["AWS_DEFAULT_REGION"] = req.aws_region.strip()
+        env_vars["AWS_DEFAULT_REGION"] = req.aws_region.strip()
 
-    # Update LLM Provider
+    # ── Active Provider ───────────────────────────────────────────────────────
     if req.default_provider:
         os.environ["LLM_PROVIDER"] = req.default_provider
         env_vars["LLM_PROVIDER"] = req.default_provider
         os.environ["DEFAULT_LLM_PROVIDER"] = req.default_provider
         env_vars["DEFAULT_LLM_PROVIDER"] = req.default_provider
 
-    # Update Provider specific models
+    # ── Per-provider Models ───────────────────────────────────────────────────
+    def _set(env_key, val):
+        if val and val.strip():
+            os.environ[env_key] = val.strip()
+            env_vars[env_key] = val.strip()
+
+    _set("MODEL_OPENAI_ROUTER", req.openai_router_model)
+    _set("MODEL_OPENAI",        req.openai_exec_model)
+    _set("MODEL_GEMINI_ROUTER", req.gemini_router_model)
+    _set("MODEL_GEMINI",        req.gemini_exec_model)
+    _set("MODEL_ROUTER_MOONSHOT", req.moonshot_router_model)
+    _set("MODEL_EXEC_MOONSHOT",   req.moonshot_exec_model)
+    _set("MODEL_ROUTER_OPENROUTER", req.openrouter_router_model)
+    _set("MODEL_EXEC_OPENROUTER",   req.openrouter_exec_model)
+    _set("MODEL_BEDROCK_ROUTER", req.bedrock_router_model)
+    _set("MODEL_BEDROCK_EXEC",   req.bedrock_exec_model)
+
+    # Legacy generic model fields (kept for backward compat with old JS callers)
     provider = req.default_provider or "moonshot"
     if req.router_model and req.router_model.strip():
-        if provider == "moonshot":
-            os.environ["MODEL_ROUTER_MOONSHOT"] = req.router_model.strip()
-            env_vars["MODEL_ROUTER_MOONSHOT"] = req.router_model.strip()
-        elif provider == "openai":
-            os.environ["MODEL_OPENAI_ROUTER"] = req.router_model.strip()
-            env_vars["MODEL_OPENAI_ROUTER"] = req.router_model.strip()
-        elif provider == "gemini":
-            os.environ["MODEL_GEMINI_ROUTER"] = req.router_model.strip()
-            env_vars["MODEL_GEMINI_ROUTER"] = req.router_model.strip()
-        elif provider == "openrouter":
-            os.environ["MODEL_ROUTER_OPENROUTER"] = req.router_model.strip()
-            env_vars["MODEL_ROUTER_OPENROUTER"] = req.router_model.strip()
-
+        legacy_map = {"moonshot": "MODEL_ROUTER_MOONSHOT", "openai": "MODEL_OPENAI_ROUTER",
+                      "gemini": "MODEL_GEMINI_ROUTER", "openrouter": "MODEL_ROUTER_OPENROUTER",
+                      "bedrock": "MODEL_BEDROCK_ROUTER"}
+        _set(legacy_map.get(provider, "MODEL_ROUTER_MOONSHOT"), req.router_model)
     if req.exec_model and req.exec_model.strip():
-        if provider == "moonshot":
-            os.environ["MODEL_EXEC_MOONSHOT"] = req.exec_model.strip()
-            env_vars["MODEL_EXEC_MOONSHOT"] = req.exec_model.strip()
-        elif provider == "openai":
-            os.environ["MODEL_OPENAI"] = req.exec_model.strip()
-            env_vars["MODEL_OPENAI"] = req.exec_model.strip()
-        elif provider == "gemini":
-            os.environ["MODEL_GEMINI"] = req.exec_model.strip()
-            env_vars["MODEL_GEMINI"] = req.exec_model.strip()
-        elif provider == "openrouter":
-            os.environ["MODEL_EXEC_OPENROUTER"] = req.exec_model.strip()
-            env_vars["MODEL_EXEC_OPENROUTER"] = req.exec_model.strip()
+        legacy_map = {"moonshot": "MODEL_EXEC_MOONSHOT", "openai": "MODEL_OPENAI",
+                      "gemini": "MODEL_GEMINI", "openrouter": "MODEL_EXEC_OPENROUTER",
+                      "bedrock": "MODEL_BEDROCK_EXEC"}
+        _set(legacy_map.get(provider, "MODEL_EXEC_MOONSHOT"), req.exec_model)
 
-    # Update Redis
+    # ── Redis ─────────────────────────────────────────────────────────────────
     host = (req.redis_host or "localhost").strip()
     port = (req.redis_port or "6379").strip()
-    pw = (req.redis_password or "").strip()
-    
-    redis_url = f"redis://{host}:{port}"
-    os.environ["REDIS_URL"] = redis_url
-    env_vars["REDIS_URL"] = redis_url
+    pw   = (req.redis_password or "").strip()
+    redis_url_val = f"redis://{host}:{port}"
+    os.environ["REDIS_URL"] = redis_url_val
+    env_vars["REDIS_URL"]   = redis_url_val
     os.environ["REDIS_PASSWORD"] = pw
-    env_vars["REDIS_PASSWORD"] = pw
+    env_vars["REDIS_PASSWORD"]   = pw
 
     try:
         with open(env_file, "w", encoding="utf-8") as f:
@@ -981,7 +1007,7 @@ def save_api_keys(req: ApiKeysRequest):
     except Exception as e:
         print(f"Notice: Could not write to .env file: {e}")
 
-    return {"success": True, "message": "API keys, models, and Redis credentials successfully updated."}
+    return {"success": True, "message": "API keys, models, and credentials successfully updated."}
 
 # WebSocket server for logging streaming
 @app.websocket("/ws/logs")

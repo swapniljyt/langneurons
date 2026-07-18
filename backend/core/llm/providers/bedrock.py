@@ -7,7 +7,7 @@ class BedrockProvider(BaseLLMProvider):
 
     def supports_thinking(self) -> bool:
         # Returns True if the selected execution model is a known reasoning/thinking model
-        model_name = os.getenv("MODEL_EXEC_BEDROCK", "").lower()
+        model_name = (os.getenv("MODEL_EXEC_BEDROCK") or os.getenv("MODEL_BEDROCK_EXEC") or "").lower()
         return "r1" in model_name or "thinking" in model_name or "reasoning" in model_name
 
     def _get_bedrock_client(self):
@@ -53,7 +53,7 @@ class BedrockProvider(BaseLLMProvider):
         except ImportError:
             from langchain_aws import ChatBedrock as ChatBedrockConverse
 
-        model_name = os.getenv("MODEL_ROUTER_BEDROCK", "us.anthropic.claude-haiku-4-5-20251001-v1:0")
+        model_name = os.getenv("MODEL_ROUTER_BEDROCK") or os.getenv("MODEL_BEDROCK_ROUTER") or "us.anthropic.claude-haiku-4-5-20251001-v1:0"
 
         return ChatBedrockConverse(
             model_id=model_name,
@@ -67,7 +67,7 @@ class BedrockProvider(BaseLLMProvider):
         except ImportError:
             from langchain_aws import ChatBedrock as ChatBedrockConverse
 
-        model_name = os.getenv("MODEL_EXEC_BEDROCK", "us.anthropic.claude-sonnet-4-5-20250929-v1:0")
+        model_name = os.getenv("MODEL_EXEC_BEDROCK") or os.getenv("MODEL_BEDROCK_EXEC") or "us.anthropic.claude-sonnet-4-5-20250929-v1:0"
 
         return ChatBedrockConverse(
             model_id=model_name,

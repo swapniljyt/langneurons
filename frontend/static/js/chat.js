@@ -27,8 +27,15 @@ function startExecutionMonitoring() {
     stopExecutionMonitoring();
     lastMessageTime = Date.now();
     
+    // Trigger initial telemetry update
+    window.dispatchEvent(new CustomEvent('update-telemetry'));
+    
     executionTimeoutCheck = setInterval(() => {
         const inactiveDuration = Date.now() - lastMessageTime;
+        
+        // Refresh telemetry in real-time during execution
+        window.dispatchEvent(new CustomEvent('update-telemetry'));
+        
         // If inactive for >= 8 seconds and we don't have a wait notice already
         if (inactiveDuration >= 8000 && !currentWaitMessageEl && currentAssistantBubble) {
             currentWaitMessageEl = document.createElement('div');
@@ -225,9 +232,12 @@ window.addEventListener('swarm-ws-message', (e) => {
 
     if (data.type === 'stdout' && data.text) {
         processChatStreamLog(data.text.trimEnd());
-        
-        // If the execution completes, stop the border spinners
-        if (data.text.includes('Complete. Response:') || data.text.includes('exited with status')) {
+
+        // Only stop spinners when the process itself exits — NOT on mid-stream
+        // telemetry lines like 'Complete. Response:' (those arrive while the
+        // agent_response block is still being streamed). The </agent_response>
+        // close tag handler below is the authoritative place to stop spinners.
+        if (data.text.includes('exited with status') || data.text.includes('Process exited')) {
             setNeuronThinking(null);
             lastActiveNeuron = null;
             stopExecutionMonitoring();
@@ -239,6 +249,7 @@ window.addEventListener('swarm-ws-message', (e) => {
         stopExecutionMonitoring();
     } else if (data.type === 'status' && data.text) {
         appendSystemMessage(data.text.trim());
+        // Stop spinner only on true idle/finished signals from the backend
         if (data.text.toLowerCase().includes('idle') || data.text.toLowerCase().includes('finished')) {
             setNeuronThinking(null);
             lastActiveNeuron = null;
@@ -591,10 +602,43 @@ export function processChatStreamLog(rawLogText) {
             const agentMatch = cleanLine.match(/\[([a-zA-Z0-9_-]+)[^\]]*\]/) || cleanLine.match(/(?:neuron|agent)\s+([a-zA-Z0-9_-]+)/i);
             if (agentMatch && agentMatch[1]) {
                 const currentNeuron = agentMatch[1];
-                highlightActiveThinkingNeuron(currentNeuron);
-                if (lastActiveNeuron !== currentNeuron) {
+                
+                if (cleanLine.includes('Complete. Response:')) {
+                    // Turn OFF spinner for this completed neuron
+                    setNeuronThinking(currentNeuron, false);
+                    if (lastActiveNeuron === currentNeuron) {
+                        lastActiveNeuron = null;
+                    }
+                } else if (cleanLine.includes('responded:')) {
+                    // Example: "  ✅ [neuron_1] neuron_2 responded: ..."
+                    // Turn OFF spinner for subordinate
+                    const subMatch = cleanLine.match(/\]\s+([a-zA-Z0-9_-]+)\s+responded:/i);
+                    const subNeuron = subMatch ? subMatch[1] : null;
+                    if (subNeuron) {
+                        setNeuronThinking(subNeuron, false);
+                    }
+                    // Reactivate supervisor spinner
+                    setNeuronThinking(currentNeuron, true);
                     lastActiveNeuron = currentNeuron;
-                    setNeuronThinking(currentNeuron);
+                    highlightActiveThinkingNeuron(currentNeuron);
+                } else if (cleanLine.includes('Delegating to')) {
+                    // Example: "  ➡️  [neuron_1] Delegating to neuron_2..."
+                    // Turn OFF supervisor spinner temporarily and turn ON subordinate spinner
+                    const subMatch = cleanLine.match(/Delegating to\s+([a-zA-Z0-9_-]+)/i);
+                    const subNeuron = subMatch ? subMatch[1] : null;
+                    setNeuronThinking(currentNeuron, false);
+                    if (subNeuron) {
+                        setNeuronThinking(subNeuron, true);
+                        highlightActiveThinkingNeuron(subNeuron);
+                        lastActiveNeuron = subNeuron;
+                    }
+                } else {
+                    // General activation / execution telemetry
+                    highlightActiveThinkingNeuron(currentNeuron);
+                    if (lastActiveNeuron !== currentNeuron) {
+                        lastActiveNeuron = currentNeuron;
+                        setNeuronThinking(currentNeuron, true);
+                    }
                 }
             }
 

@@ -127,10 +127,11 @@ export async function showSandboxContent(file, targetBtn) {
         }
     }
     
-    // Clear navbar attention badge when user inspects sandbox
+    // Clear navbar attention badge AND blink when user inspects sandbox
     if (elements.sandboxNavBadge) {
         elements.sandboxNavBadge.classList.add('hidden');
     }
+    clearSandboxNavBlink();
     
     try {
         const response = await fetch(`${API_BASE}/api/sandbox/content?path=${encodeURIComponent(file.path)}`);
@@ -183,12 +184,28 @@ export async function showSandboxContent(file, targetBtn) {
     }
 }
 /**
+ * Removes the sandbox nav blink animation.
+ */
+function clearSandboxNavBlink() {
+    const navBtn = document.getElementById('sandbox-nav-btn');
+    if (navBtn) navBtn.classList.remove('sandbox-nav-blink');
+}
+
+/**
  * Triggers a real-time floating toast notification and navbar badge when an agent creates code.
  */
 export function triggerSandboxNotification(fileName, filePath) {
-    // 1. Show navbar attention badge
+    // 1. Show navbar attention badge + blink the nav button
     if (elements.sandboxNavBadge) {
         elements.sandboxNavBadge.classList.remove('hidden');
+    }
+    const navBtn = document.getElementById('sandbox-nav-btn');
+    if (navBtn) {
+        // Remove first to restart animation if already blinking
+        navBtn.classList.remove('sandbox-nav-blink');
+        // Force reflow so the animation restarts fresh
+        void navBtn.offsetWidth;
+        navBtn.classList.add('sandbox-nav-blink');
     }
 
     // 2. Refresh file list in background
@@ -203,9 +220,10 @@ export function triggerSandboxNotification(fileName, filePath) {
         // Handle "View Code" button click on toast
         if (elements.sandboxToastViewBtn) {
             elements.sandboxToastViewBtn.onclick = () => {
-                // Switch to Sandbox tab
+                // Switch to Sandbox tab & clear blink
                 const sandboxTabBtn = document.querySelector('[data-tab="sandbox"]');
                 if (sandboxTabBtn) sandboxTabBtn.click();
+                clearSandboxNavBlink();
 
                 // Open file in Monaco IDE
                 openFileInMonaco({ name: fileName, path: filePath, relative_path: fileName });
