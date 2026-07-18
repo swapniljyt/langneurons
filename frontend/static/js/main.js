@@ -1,4 +1,4 @@
-import { appState } from './state.js?v=20260717l';
+import { API_BASE, appState } from './state.js?v=20260718b';
 import { elements } from './dom.js?v=20260717l';
 import { showConsoleLayout, handleLogout } from './auth.js?v=20260717l';
 import { loadDocs } from './api.js?v=20260717l';
@@ -444,7 +444,7 @@ function setupEventListeners() {
 async function fetchCostTelemetry(sessionId) {
     const sid = sessionId || elements.sessionIdInput?.value || 'ecommerce_build_session';
     try {
-        const resp = await fetch(`/api/cost/metrics?session_id=${encodeURIComponent(sid)}`);
+        const resp = await fetch(`${API_BASE}/api/cost/metrics?session_id=${encodeURIComponent(sid)}`);
         const data = await resp.json();
         if (data.success && data.summary) {
             if (elements.costTotalSpent) elements.costTotalSpent.textContent = `$${data.summary.total_cost_usd.toFixed(5)}`;
@@ -496,7 +496,7 @@ async function fetchCostTelemetry(sessionId) {
 
 async function fetchApiKeysStatus() {
     try {
-        const resp = await fetch('/api/settings/keys');
+        const resp = await fetch(`${API_BASE}/api/settings/keys`);
         const data = await resp.json();
         if (data.success && data.keys) {
             const k = data.keys;
@@ -564,7 +564,7 @@ async function saveApiKeys() {
     }
 
     try {
-        const resp = await fetch('/api/settings/keys', {
+        const resp = await fetch(`${API_BASE}/api/settings/keys`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -686,7 +686,7 @@ async function handleStartCompile() {
 
     try {
         // POST script to server → get back script_path for WS runner
-        const resp = await fetch('/api/swarm/compile-run', {
+        const resp = await fetch(`${API_BASE}/api/swarm/compile-run`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -736,7 +736,9 @@ function resetCompileBtn() {
 }
 
 function runViaWebSocket(scriptPath, sessionId) {
-    const ws = new WebSocket(`ws://${window.location.host}/ws/logs`);
+    const url = new URL(API_BASE);
+    const wsProto = url.protocol === 'https:' ? 'wss:' : 'ws:';
+    const ws = new WebSocket(`${wsProto}//${url.host}/ws/logs`);
     appState.ws = ws;
 
     ws.onopen = () => {
@@ -811,7 +813,7 @@ async function onCompileSuccess(sessionId) {
 
     // Try to fetch compiled node data from /api/swarm/compile-results
     try {
-        const resp = await fetch(`/api/swarm/compile-results?session_id=${encodeURIComponent(sessionId)}`);
+        const resp = await fetch(`${API_BASE}/api/swarm/compile-results?session_id=${encodeURIComponent(sessionId)}`);
         const data = await resp.json();
         if (data.success && data.nodes) {
             data.nodes.forEach(compiledNode => {
@@ -1068,7 +1070,7 @@ export function startTelemetryPolling(sessionId) {
             return;
         }
         try {
-            const resp = await fetch(`/api/swarm/compile-results?session_id=${encodeURIComponent(sessionId)}`);
+            const resp = await fetch(`${API_BASE}/api/swarm/compile-results?session_id=${encodeURIComponent(sessionId)}`);
             const data = await resp.json();
             if (data.success && data.nodes) {
                 updateTelemetryUI(data.nodes);

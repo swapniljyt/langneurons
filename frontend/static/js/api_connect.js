@@ -1,3 +1,5 @@
+import { API_BASE } from './state.js?v=20260718b';
+
 /**
  * api_connect.js — LangNeurons Connect API Section
  * Manages 5 provider cards: OpenAI, Google Gemini, Moonshot, OpenRouter, Amazon Bedrock.
@@ -178,7 +180,7 @@ window.saveProviderCard = async function(providerId) {
     Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
 
     try {
-        const resp = await fetch('/api/settings/keys', {
+        const resp = await fetch(`${API_BASE}/api/settings/keys`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -217,7 +219,7 @@ window.saveProviderCard = async function(providerId) {
 // ── Load & render API status ─────────────────────────────────────────────────
 async function loadApiStatus() {
     try {
-        const resp = await fetch('/api/settings/keys');
+        const resp = await fetch(`${API_BASE}/api/settings/keys`);
         const data = await resp.json();
         if (!data.success) return;
         const k = data.keys;
@@ -266,6 +268,12 @@ async function loadApiStatus() {
         if (k.aws_region) {
             const regionEl = document.getElementById('aws-region-input');
             if (regionEl) regionEl.value = k.aws_region;
+        }
+
+        // Decoupled Backend URL
+        const backendInput = document.getElementById('backend-url-input');
+        if (backendInput) {
+            backendInput.value = localStorage.getItem('LANGNEURONS_BACKEND_URL') || '';
         }
 
     } catch (e) {
@@ -394,6 +402,31 @@ export function initConnectAPI() {
                     </button>
                 </div>
             </div>
+
+            <!-- Decoupled Backend URL (Vercel) -->
+            <div class="rounded-2xl border border-[#1a2e22] bg-[#060d09] p-5 space-y-4">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[#00ff9d] !text-base">dns</span>
+                    Decoupled Backend Host (Vercel / Static Deployments)
+                </h3>
+                <p class="text-[10px] text-gray-500 font-mono">
+                    If you deploy the static frontend on Vercel, point it to your running FastAPI backend on Railway/Render. Leave empty to connect to the current domain.
+                </p>
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-mono uppercase text-gray-400">Backend API URL</label>
+                    <input type="text" id="backend-url-input" placeholder="e.g. https://your-backend.railway.app"
+                           class="w-full bg-[#070d0a] border border-[#1a2e22] rounded-lg px-3 py-2 text-white font-mono text-xs focus:outline-none focus:border-[#00ff9d]/60 transition-all">
+                </div>
+                <div class="flex justify-between items-center pt-2 border-t border-[#1a2e22]">
+                    <span id="save-backend-msg" class="text-[10px] font-mono text-[#00ff9d] opacity-0 transition-opacity"></span>
+                    <button id="save-backend-btn" onclick="saveBackendUrl()"
+                            class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold font-mono
+                                   bg-[#00ff9d]/10 border border-[#00ff9d]/30 text-[#00ff9d]
+                                   hover:bg-[#00ff9d] hover:text-[#002114] active:scale-95 transition-all">
+                        <span class="material-symbols-outlined !text-sm">save</span> Save Backend URL
+                    </button>
+                </div>
+            </div>
         </div>`;
 
     // Wire up radio buttons → highlight active card
@@ -420,8 +453,30 @@ window.saveRedis = async function() {
             default_provider: document.querySelector('input[name="active-provider-radio"]:checked')?.value || undefined
         };
         Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
-        await fetch('/api/settings/keys', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        await fetch(`${API_BASE}/api/settings/keys`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
     } finally {
         if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined !text-sm">save</span> Save Redis Config'; }
     }
+};
+
+// ── Save Backend URL ──────────────────────────────────────────────────────────
+window.saveBackendUrl = function() {
+    const input = document.getElementById('backend-url-input');
+    const msg = document.getElementById('save-backend-msg');
+    if (!input || !msg) return;
+
+    let val = input.value.trim();
+    if (val) {
+        val = val.replace(/\/$/, '');
+        localStorage.setItem('LANGNEURONS_BACKEND_URL', val);
+    } else {
+        localStorage.removeItem('LANGNEURONS_BACKEND_URL');
+    }
+
+    msg.textContent = '✓ Saved! Page will reload...';
+    msg.style.opacity = '1';
+    msg.style.color = '#00ff9d';
+    setTimeout(() => {
+        window.location.reload();
+    }, 1200);
 };

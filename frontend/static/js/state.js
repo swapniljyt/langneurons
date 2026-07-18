@@ -1,4 +1,4 @@
-export const API_BASE = window.location.origin;
+export const API_BASE = localStorage.getItem('LANGNEURONS_BACKEND_URL') || window.location.origin;
 
 // Application State
 export const appState = {

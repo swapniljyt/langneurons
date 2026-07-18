@@ -1,4 +1,4 @@
-import { appState } from './state.js?v=20260717j';
+import { API_BASE, appState } from './state.js?v=20260718b';
 import { elements } from './dom.js?v=20260717j';
 import { appendTelemetryLog } from './telemetry.js?v=20260717j';
 
@@ -13,8 +13,9 @@ export function startSwarmRun() {
     appendTelemetryLog('▶ Spawning Swarm Orchestration Run...', 'status');
 
     // Connect to WebSockets
-    const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${wsProto}//${window.location.host}/ws/logs`;
+    const url = new URL(API_BASE);
+    const wsProto = url.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${wsProto}//${url.host}/ws/logs`;
     
     if (appState.ws) {
         try { appState.ws.close(); } catch(e) {}
@@ -93,8 +94,9 @@ export function sendTerminalInput() {
 export function sendWebSocketCommand(payload) {
     if (!appState.ws || appState.ws.readyState !== WebSocket.OPEN) {
         // If no open WebSocket, open one first then send
-        const wsProto = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProto}//${window.location.host}/ws/logs`;
+        const url = new URL(API_BASE);
+        const wsProto = url.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${wsProto}//${url.host}/ws/logs`;
         appState.ws = new WebSocket(wsUrl);
         appState.ws.onopen = () => {
             appState.ws.send(JSON.stringify(payload));
